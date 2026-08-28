@@ -2,6 +2,7 @@ using Meta.XR.MRUtilityKit;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static Meta.XR.MRUtilityKit.MRUK;
 
 public class RoomSetupManager : MonoBehaviour
@@ -80,5 +81,15 @@ public class RoomSetupManager : MonoBehaviour
 
         // --> YOUR NEXT MVP STEP GOES HERE <--
         // e.g., Spawn the RC Car, connect to Photon Fusion, or load the UI dashboard.
+        GoToScene("GRLWhat");
+
+    }
+
+    public void GoToScene(string nextSceneName)
+    {
+        Debug.Log($"[Transition] Attempting to load scene: {nextSceneName}");
+
+        // Load the scene asynchronously in the background to prevent VR freezing
+        SceneManager.LoadSceneAsync(nextSceneName);
     }
 }
