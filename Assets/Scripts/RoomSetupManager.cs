@@ -81,7 +81,7 @@ public class RoomSetupManager : MonoBehaviour
 
         // --> YOUR NEXT MVP STEP GOES HERE <--
         // e.g., Spawn the RC Car, connect to Photon Fusion, or load the UI dashboard.
-        GoToScene("GRLWhat");
+        //GoToScene("GRLWhat");
 
     }
 
