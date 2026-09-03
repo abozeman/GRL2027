@@ -1,4 +1,6 @@
+using Assets.Scripts.Models;
 using Meta.XR.MRUtilityKit;
+using Newtonsoft.Json;
 using RestClient.Core;
 using RestClient.Core.Models;
 using System.Collections.Generic;
@@ -12,6 +14,8 @@ using static MetaAuthManager;
 public class RoomSetupManager : MonoBehaviour
 {
     private string baseUrl = "http://192.168.2.49:8001";
+    public GameObject raceUIButtonContainer; // Assign this in the Unity Inspector
+    public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
 
 
     private async void Start()
@@ -101,18 +105,49 @@ public class RoomSetupManager : MonoBehaviour
         // send a get request
         StartCoroutine(RestWebClient.Instance.HttpGet("http://192.168.2.49:8001/api/racelist", (r) => OnRequestComplete(r)));
 
-        // send a get request
-        //GoToScene("GRLWhere");
     }
 
     void OnRequestComplete(Response response)
     {
         Debug.Log($"Status Code: {response.StatusCode}");
-        Debug.Log($"Data: {response.Data}");
-        Debug.Log($"Error: {response.Error}");
 
-        Debug.Log($"Get races : {response.Data}");
+        if (!string.IsNullOrEmpty(response.Error))
+        {
+            Debug.LogError($"API Error: {response.Error}");
+            return;
+        }
 
+        if (!string.IsNullOrEmpty(response.Data))
+        {
+            // Deserialize the JSON string directly into your RaceList model
+            RaceList raceResponse = JsonConvert.DeserializeObject<RaceList>(response.Data);
+
+            if (raceResponse != null && raceResponse.result == "success")
+            {
+                Debug.Log($"Successfully deserialized {raceResponse.data.Length} races.");
+
+                // Iterate through the array to access individual Race properties
+                foreach (Race race in raceResponse.data)
+                {
+                    Debug.Log($"Lobby: {race.lobby_name} | Room: {race.room_name} | Status: {race.status}");
+
+                    // Instantiate the race button prefab
+                    GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
+
+                    // Highly recommended for UI elements to prevent weird stretching
+                    raceButton.transform.localScale = Vector3.one;
+
+                    // Set the button text to the lobby name
+                    TMPro.TextMeshProUGUI buttonText = raceButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                    if (buttonText != null)
+                    {
+                        buttonText.text = race.lobby_name;
+                    }
+                }
+
+                // TODO: Populate your scrollable UI panel with this list
+            }
+        }
     }
 
     public void GoToScene(string nextSceneName)
