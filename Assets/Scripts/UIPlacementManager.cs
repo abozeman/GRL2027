@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UIPlacementManager : MonoBehaviour
 {
-    public float distanceFromUser = 1.0f;
+    public float distanceFromUser = 0.3f;
     private OVRCameraRig userCamera;
 
     void Start()
@@ -25,6 +25,8 @@ public class UIPlacementManager : MonoBehaviour
 
         // 3. Flip the rotation by 180 degrees so the UI text isn't backwards
         transform.Rotate(0, 180, 0);
+        transform.Translate(0, 1.5f, 0);
+
     }
 }
 
