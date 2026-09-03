@@ -1,12 +1,19 @@
 using Meta.XR.MRUtilityKit;
+using RestClient.Core;
+using RestClient.Core.Models;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Meta.XR.MRUtilityKit.MRUK;
+using static MetaAuthManager;
 
 public class RoomSetupManager : MonoBehaviour
 {
+    private string baseUrl = "http://192.168.2.49:8001";
+
+
     private async void Start()
     {
         // Subscribe to the event so we know when the room is fully built
@@ -79,9 +86,32 @@ public class RoomSetupManager : MonoBehaviour
         // STEP 3: The ultimate success state.
         Debug.Log($"[MRUK] Room generated successfully! Found {room.Anchors.Count} anchors.");
 
-        // --> YOUR NEXT MVP STEP GOES HERE <--
-        // e.g., Spawn the RC Car, connect to Photon Fusion, or load the UI dashboard.
-        //GoToScene("GRLWhat");
+        GetRaces();
+
+    }
+
+
+
+    private void GetRaces()
+    {
+        // TODO: Call the API you already wrote.
+        // E.g., StartCoroutine(CallMyCustomAPI(metaUserId, metaUserName));
+        Debug.Log($"Initiating API call to get races from the database...");
+        // setup the request header
+        // send a get request
+        StartCoroutine(RestWebClient.Instance.HttpGet("http://192.168.2.49:8001/api/racelist", (r) => OnRequestComplete(r)));
+
+        // send a get request
+        //GoToScene("GRLWhere");
+    }
+
+    void OnRequestComplete(Response response)
+    {
+        Debug.Log($"Status Code: {response.StatusCode}");
+        Debug.Log($"Data: {response.Data}");
+        Debug.Log($"Error: {response.Error}");
+
+        Debug.Log($"Get races : {response.Data}");
 
     }
 

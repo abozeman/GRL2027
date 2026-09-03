@@ -131,7 +131,9 @@ public class MetaAuthManager : MonoBehaviour
         Debug.Log($"Data: {response.Data}");
         Debug.Log($"Error: {response.Error}");
 
-        GoToScene("GRLWhere");
+        //TODO: Handle the response appropriately. For example, check if the user was successfully added to the database and proceed accordingly.
+
+        GoToScene("GRLLobby");
     }
 
     public class GRLUser
