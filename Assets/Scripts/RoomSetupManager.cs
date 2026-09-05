@@ -119,34 +119,57 @@ public class RoomSetupManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(response.Data))
         {
-            // Deserialize the JSON string directly into your RaceList model
-            RaceList raceResponse = JsonConvert.DeserializeObject<RaceList>(response.Data);
+            PopulateUIButtons(response.Data);
+        }
+    }
 
-            if (raceResponse != null && raceResponse.result == "success")
+    private void PopulateUIButtons(string responseData)
+    {
+        // Deserialize the JSON string directly into your RaceList model
+        RaceList raceList = JsonConvert.DeserializeObject<RaceList>(responseData);
+
+        if (raceList != null && raceList.result == "success")
+        {
+            Debug.Log($"Successfully deserialized {raceList.data.Length} races.");
+
+            // Iterate through the array to access individual Race properties
+            foreach (Race race in raceList.data)
             {
-                Debug.Log($"Successfully deserialized {raceResponse.data.Length} races.");
+                Debug.Log($"Lobby: {race.lobby_name} | Room: {race.room_name} | Status: {race.status}");
 
-                // Iterate through the array to access individual Race properties
-                foreach (Race race in raceResponse.data)
+                // Instantiate the race button prefab
+                GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
+
+                // Highly recommended for UI elements to prevent weird stretching
+                raceButton.transform.localScale = Vector3.one;
+
+                // Set the button text to the lobby name
+                TMPro.TextMeshProUGUI[] buttonTexts = raceButton.GetComponentsInChildren<TMPro.TextMeshProUGUI>();
+
+                foreach (TMPro.TextMeshProUGUI textItem in buttonTexts)
                 {
-                    Debug.Log($"Lobby: {race.lobby_name} | Room: {race.room_name} | Status: {race.status}");
+                    var parentName = textItem.gameObject.name;
+                    Debug.Log($"Parent Object 1st Try: {textItem.gameObject.name}");
 
-                    // Instantiate the race button prefab
-                    GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
-
-                    // Highly recommended for UI elements to prevent weird stretching
-                    raceButton.transform.localScale = Vector3.one;
-
-                    // Set the button text to the lobby name
-                    TMPro.TextMeshProUGUI buttonText = raceButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                    if (buttonText != null)
+                    switch (parentName)
                     {
-                        buttonText.text = race.lobby_name;
+                        case "Session":
+                            textItem.text = race.lobby_name;
+                            break;
+                        case "Name":
+                            textItem.text = race.room_name;
+                            break;
+                        case "Status":
+                            textItem.text = race.status;
+                            break;
                     }
+
+
                 }
 
-                // TODO: Populate your scrollable UI panel with this list
             }
+
+            // TODO: Populate your scrollable UI panel with this list
         }
     }
 
