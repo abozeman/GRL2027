@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Fusion;
+using System;
 using System.Collections.Generic;
-using Fusion;
+using UnityEngine.SceneManagement;
 
 namespace Assets.CryptoKartz.Scripts.Utils
 {
@@ -15,6 +16,8 @@ namespace Assets.CryptoKartz.Scripts.Utils
         public string PublicIP { get; set; }
         public int SceneId { get; set; }
         public Dictionary<string, SessionProperty> SessionProperties { get; private set; } = new Dictionary<string, SessionProperty>();
+        private static SceneRef sRef;
+
 
         public DedicatedServerConfig() { }
 
@@ -30,7 +33,10 @@ namespace Assets.CryptoKartz.Scripts.Utils
             config.SessionProperties.Add("RacePlatformLevel", agentConfig.level);
             config.SessionProperties.Add("trackid", agentConfig.trackId);
 
-            config.SceneId = (int)SceneDefs.ERLGame;
+            sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+
+
+            config.SceneId = sRef.AsIndex;
 
             return config;
         }
@@ -59,8 +65,26 @@ namespace Assets.CryptoKartz.Scripts.Utils
               $"{nameof(SessionProperties)}={properties}]";
         }
 
+        public static SceneRef GetSceneRefFromPath(string scenePath)
+        {
+            // 1. Resolve the Unity build index from the specific asset path
+            int buildIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
 
-        
+            // 2. Ensure the scene actually exists in the Build Settings
+            if (buildIndex >= 0)
+            {
+                // 3. Convert the valid build index into a Fusion SceneRef
+                return SceneRef.FromIndex(buildIndex);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
+                return default;
+            }
+        }
+
+
+
 
     }
 }

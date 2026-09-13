@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GRLLobby.unity
     guid: ae1bb6a811869bf45ad6c44808d1c882
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 17901c78fe1c54a45aa3308140d4c609, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 39a9f035649c6e64eacb58bc4cac125e, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: e5f9551e8f4281242b84a79074582188, type: 2}

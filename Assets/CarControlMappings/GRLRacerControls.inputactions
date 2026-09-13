@@ -1,0 +1,55 @@
+{
+    "version": 1,
+    "name": "GRLRacerControls",
+    "maps": [
+        {
+            "name": "GRLController",
+            "id": "3b89762a-db9f-4f16-86c9-b8448cb8bdf3",
+            "actions": [
+                {
+                    "name": "GRLLeftStick",
+                    "type": "Value",
+                    "id": "7dab1b93-99bb-42d2-82cb-733e0a2d259e",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "GRLRightStick",
+                    "type": "Value",
+                    "id": "631e5d0a-5147-4073-820d-a125c5cbe014",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b5743a41-d541-4da8-b357-8467d1b2801a",
+                    "path": "<XRController>{RightHand}/{Primary2DAxis}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "GRLRightStick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3732069e-ff01-4bbf-9c3d-1cfaf9bee1fd",
+                    "path": "<XRController>{LeftHand}/{Secondary2DAxis}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "GRLLeftStick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

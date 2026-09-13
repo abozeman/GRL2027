@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 //using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using Application = UnityEngine.Application;
 
@@ -24,6 +25,8 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
         // Your Flask API URL (Update this to your actual server IP/Domain when deployed)
         private readonly string API_BASE_URL = "http://localhost:8001/api";
+        private SceneRef sRef;
+
 
         #region MQTT Client
 
@@ -145,6 +148,8 @@ namespace Assets.CryptoKartz.Scripts.Managers
             NetworkRunner newRaceRunner = Instantiate(_runnerServerPrefab);
             newRaceRunner.name = $"ServerRunner_{newSessionName}";
             newRaceRunner.ProvideInput = true;
+            sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+
 
             // Start the Fusion Session (Room) inside the specified Lobby
             var result = await StartSession(
@@ -152,7 +157,7 @@ namespace Assets.CryptoKartz.Scripts.Managers
                 GameMode.Server,
                 newSessionName,
                 targetLobby,
-                SceneRef.FromIndex((int)SceneDefs.ERLGame)
+                sRef
             );
 
             // Validate and Register
@@ -225,6 +230,24 @@ namespace Assets.CryptoKartz.Scripts.Managers
                 {
                     Debug.Log($"[Database] Successfully registered race {roomName}. Response: {request.downloadHandler.text}");
                 }
+            }
+        }
+
+        public static SceneRef GetSceneRefFromPath(string scenePath)
+        {
+            // 1. Resolve the Unity build index from the specific asset path
+            int buildIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
+
+            // 2. Ensure the scene actually exists in the Build Settings
+            if (buildIndex >= 0)
+            {
+                // 3. Convert the valid build index into a Fusion SceneRef
+                return SceneRef.FromIndex(buildIndex);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
+                return default;
             }
         }
 

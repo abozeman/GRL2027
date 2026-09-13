@@ -21,10 +21,8 @@ namespace cryptokartz.Scripts.GameControllers
         [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private NetworkObject _liveCarPrefab;
         [SerializeField] private NetworkObject _ghostCarPrefab;
-        [SerializeField] private List<NetworkObject> _carPrefabs = new List<NetworkObject>();
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerMap = new Dictionary<PlayerRef, NetworkObject>();
-        private Dictionary<PlayerRef, PlayerDataNetwork> _playerDataMap = new Dictionary<PlayerRef, PlayerDataNetwork>();
         private List<string> eventMessages = new List<string>();
 
         private int _playerId;

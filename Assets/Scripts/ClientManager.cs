@@ -13,6 +13,7 @@ namespace Assets.CryptoKartz.Scripts.Managers
     {
 
         Fusion.NetworkRunner runnerClient;
+        private SceneRef sRef;
 
         protected void Start()
         {
@@ -25,14 +26,15 @@ namespace Assets.CryptoKartz.Scripts.Managers
         public async Task<StartGameResult> StartClient()
         {
             //await Awaitable.WaitForSecondsAsync(30f);
-            int loadERLTask = await LoadERLAsync();
-            StartGameResult startERLTask = await StartSessionAsync("ERLGame", SceneRef.FromIndex((int)SceneDefs.ERLGame));
-            return startERLTask;
+            int loadGRLTask = await LoadGRLAsync();
+            SceneRef sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+            StartGameResult startGRLTask = await StartSessionAsync("GRLGame", sRef);
+            return startGRLTask;
         }
 
-        public async Task<int> LoadERLAsync() // assume we return an int from this long running operation 
+        public async Task<int> LoadGRLAsync() // assume we return an int from this long running operation 
         {
-            await SceneManager.LoadSceneAsync((int)SceneDefs.ERLGame, LoadSceneMode.Single);
+            await SceneManager.LoadSceneAsync(sRef.AsIndex, LoadSceneMode.Single);
             return 1;
         }
 
@@ -40,7 +42,7 @@ namespace Assets.CryptoKartz.Scripts.Managers
         {
             runnerClient = GetRunner("Client");
 
-            var result = await StartSession(runnerClient, GameMode.Client, sessionName, "ERLOrlandoDev", scene);
+            var result = await StartSession(runnerClient, GameMode.Client, sessionName, "GRLOrlandoDev", scene);
 
             // Check if all went fine
             if (result.Ok)
@@ -94,6 +96,24 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
 
 
+        }
+
+        public SceneRef GetSceneRefFromPath(string scenePath)
+        {
+            // 1. Resolve the Unity build index from the specific asset path
+            int buildIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
+
+            // 2. Ensure the scene actually exists in the Build Settings
+            if (buildIndex >= 0)
+            {
+                // 3. Convert the valid build index into a Fusion SceneRef
+                return SceneRef.FromIndex(buildIndex);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
+                return default;
+            }
         }
 
     }
