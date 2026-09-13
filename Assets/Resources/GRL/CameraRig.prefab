@@ -296,10 +296,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8520910926230465856}
-  - component: {fileID: 8310878620945931206}
   - component: {fileID: 5778319434181860738}
   - component: {fileID: 6580273661541037135}
   - component: {fileID: 6688211001766822701}
+  - component: {fileID: 3111862219118015145}
+  - component: {fileID: 870263465054677132}
   m_Layer: 0
   m_Name: CameraRig
   m_TagString: Untagged
@@ -324,24 +325,6 @@ Transform:
   - {fileID: 7887205662386523117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8310878620945931206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1730065195573409416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b023183069df224080314a560e6e1ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
-  blockId: e47682b9-c270-40b1-b16d-90b627a5ce1b
-  instanceId: 7bf427c0-ffe4-4076-86fd-e81ec256958f
-  version: 1
-  installationRoutineCheckpoint:
-    _installationRoutineId: 
-    _installationVariants: []
 --- !u!114 &5778319434181860738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,6 +454,46 @@ MonoBehaviour:
   - <Keyboard>/leftAlt
   - <Keyboard>/rightAlt
   - <Keyboard>/f2
+--- !u!114 &3111862219118015145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730065195573409416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3adf0bb75a444c61bde2e7841591bf41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.CompositionLayers::Unity.XR.CompositionLayers.CompositionLayer
+  m_UICanvas: {fileID: 0}
+  m_UIMirrorComponent: {fileID: 0}
+  m_LayerOutline: {fileID: 870263465054677132}
+  m_Order: 1
+  m_LayerData:
+    rid: 3790211493538824271
+  m_PlatformLayerDataKeys: []
+  m_PlatformLayerDataTexts: []
+  m_PlatformLayerDataBinary: 
+  references:
+    version: 2
+    RefIds:
+    - rid: 3790211493538824271
+      type: {class: PassthroughLayerData, ns: UnityEngine.XR.OpenXR.Features.Meta, asm: Unity.XR.MetaOpenXR}
+      data:
+        m_BlendType: 0
+--- !u!114 &870263465054677132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1730065195573409416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c239b33ee5aee77488aadc51463c91de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.CompositionLayers::Unity.XR.CompositionLayers.CompositionOutline
 --- !u!1 &1928368639748598371
 GameObject:
   m_ObjectHideFlags: 0
@@ -1061,7 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Meta.XR.BuildingBlocks::Meta.XR.BuildingBlocks.BuildingBlock
   blockId: 81f55626-5fad-45e9-a1df-184f330da7ba
-  instanceId: d1fcc1b3-a04a-47be-9c52-453d2b3fc493
+  instanceId: 45026164-4f38-4316-86e0-8f2966158458
   version: 1
   installationRoutineCheckpoint:
     _installationRoutineId: 2063f481-1b63-4eda-9ee8-a00df98536bc
