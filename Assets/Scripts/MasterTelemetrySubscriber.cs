@@ -87,17 +87,17 @@ namespace Assets.CryptoKartz.Scripts.Managers
         #region Subscription/Unsubscription
         protected override void SubscribeTopics()
         {
-            client.Subscribe(new string[] { string.Format("car/telemetry/vr/{0}", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            client.Subscribe(new string[] { string.Format("car/vracestate/{0}", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            client.Subscribe(new string[] { string.Format("car/telemetry/json/#", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            //client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            //client.Subscribe(new string[] { string.Format("car/vracestate/{0}", vid) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
 
         }
 
         protected override void UnsubscribeTopics()
         {
-            client.Unsubscribe(new string[] { string.Format("car/telemetry/vr/{0}", vid) });
-            client.Unsubscribe(new string[] { string.Format("car/lapupdate/{0}", vid) });
-            client.Unsubscribe(new string[] { string.Format("car/vracestate/{0}", vid) });
+            client.Unsubscribe(new string[] { string.Format("car/telemetry/json/#", vid) });
+            //client.Unsubscribe(new string[] { string.Format("car/lapupdate/{0}", vid) });
+            //client.Unsubscribe(new string[] { string.Format("car/vracestate/{0}", vid) });
         }
 
 
