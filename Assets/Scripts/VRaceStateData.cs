@@ -17,27 +17,41 @@ public class VRaceStateData
 
     public VRaceStateData(string jsonString)
     {
-        Dictionary<String, String> vRaceStateData2 = CreateFromJSON("{\"VRaceStateData\":" + jsonString + "}");
-        Dictionary<String, String> vRaceStateData3 = CreateFromJSON(vRaceStateData2["VRaceStateData"]);
-
-        this.type = vRaceStateData3["type"];
-        this.vid = vRaceStateData3["vid"];
-        this.lap = int.Parse(vRaceStateData3["lap"]);
-        this.overlapFlag = bool.Parse(vRaceStateData3["overlap_flag"]);
-        this.offtrackFlag = bool.Parse(vRaceStateData3["offtrack_flag"]);
-        this.px = float.Parse(vRaceStateData3["posX"]);
-        this.pz = float.Parse(vRaceStateData3["posZ"]);
-
+        try
+        {
+            // Deserialize directly into this object instance
+            JsonConvert.PopulateObject(jsonString, this);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to parse VRaceStateData: {e.Message}");
+        }
     }
+
+
+    //public VRaceStateData(string jsonString)
+    //{
+    //    Dictionary<String, String> vRaceStateData2 = CreateFromJSON("{\"VRaceStateData\":" + jsonString + "}");
+    //    Dictionary<String, String> vRaceStateData3 = CreateFromJSON(vRaceStateData2["VRaceStateData"]);
+
+    //    this.type = vRaceStateData3["type"];
+    //    this.vid = vRaceStateData3["vid"];
+    //    this.lap = int.Parse(vRaceStateData3["lap"]);
+    //    this.overlapFlag = bool.Parse(vRaceStateData3["overlap_flag"]);
+    //    this.offtrackFlag = bool.Parse(vRaceStateData3["offtrack_flag"]);
+    //    this.px = float.Parse(vRaceStateData3["posX"]);
+    //    this.pz = float.Parse(vRaceStateData3["posZ"]);
+
+    //}
 
     /// <summary>
     /// Creates from JSON.
     /// </summary>
     /// <param name="jsonString">The json string.</param>
     /// <returns><![CDATA[Dictionary<String, String>]]></returns>
-    public Dictionary<String, String> CreateFromJSON(string jsonString)
-    {
-        return JsonConvert.DeserializeObject<Dictionary<String, String>>(jsonString);
-    }
+    //public Dictionary<String, String> CreateFromJSON(string jsonString)
+    //{
+    //    return JsonConvert.DeserializeObject<Dictionary<String, String>>(jsonString);
+    //}
 }
 

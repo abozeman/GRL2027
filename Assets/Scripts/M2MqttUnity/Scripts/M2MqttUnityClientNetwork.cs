@@ -14,6 +14,13 @@ namespace M2MqttUnity
     /// </summary>
     public class M2MqttUnityClientNetwork : Fusion.SimulationBehaviour
     {
+
+        // 1. CREATE THE SINGLETON INSTANCE
+        public static M2MqttUnityClientNetwork Instance { get; private set; }
+
+        // 2. CREATE A PUBLIC EVENT FOR INCOMING MESSAGES
+        public event Action OnMessageReceived;
+
         [Header("MQTT broker configuration")]
         protected readonly string brokerAddress = "192.168.2.49";
         protected readonly int brokerPort = 1883;
@@ -48,6 +55,8 @@ namespace M2MqttUnity
         /// Event fired when failing to connect
         /// </summary>
         public event Action ConnectionFailed;
+
+
 
         /// <summary>
         /// Connect to the broker using current settings.

@@ -27,6 +27,9 @@ MonoBehaviour:
     m_path: Assets/Scenes/GRLLobby.unity
     m_guid: ae1bb6a811869bf45ad6c44808d1c882
   - m_enabled: 1
+    m_path: Assets/Scenes/GRLClient.unity
+    m_guid: cdba30015a05f434f9533b57739a33e9
+  - m_enabled: 1
     m_path: Assets/Scenes/GRLGame.unity
     m_guid: 9a7abd3e76d5147428864659f91bbe62
   m_HasScriptingDefines: 0

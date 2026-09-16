@@ -15,9 +15,8 @@ namespace Assets.CryptoKartz.Scripts.Managers
         Fusion.NetworkRunner runnerClient;
         private SceneRef sRef;
 
-        protected void Start()
+        protected async Task Start()
         {
-            // DontDestroyOnLoad(this.gameObject);
             // Start the client
             _ = StartClient();
         }
@@ -25,16 +24,17 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
         public async Task<StartGameResult> StartClient()
         {
-            //await Awaitable.WaitForSecondsAsync(30f);
-            int loadGRLTask = await LoadGRLAsync();
-            SceneRef sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+            sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+
+            int loadGRLTask = await LoadGRLAsync(sRef);
+
             StartGameResult startGRLTask = await StartSessionAsync("GRLGame", sRef);
             return startGRLTask;
         }
 
-        public async Task<int> LoadGRLAsync() // assume we return an int from this long running operation 
+        public async Task<int> LoadGRLAsync(SceneRef sceneRef) // assume we return an int from this long running operation 
         {
-            await SceneManager.LoadSceneAsync(sRef.AsIndex, LoadSceneMode.Single);
+            await SceneManager.LoadSceneAsync(sceneRef.AsIndex, LoadSceneMode.Single);
             return 1;
         }
 

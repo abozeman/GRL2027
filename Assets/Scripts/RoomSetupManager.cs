@@ -16,6 +16,7 @@ public class RoomSetupManager : MonoBehaviour
     private string baseUrl = "http://192.168.2.49:8001";
     public GameObject raceUIButtonContainer; // Assign this in the Unity Inspector
     public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
+    public GameObject clientManager; // Assign this in the Unity Inspector
 
 
     private async void Start()
@@ -107,7 +108,7 @@ public class RoomSetupManager : MonoBehaviour
 
     }
 
-    void OnRequestComplete(Response response)
+    private async Task OnRequestComplete(Response response)
     {
         Debug.Log($"Status Code: {response.StatusCode}");
 
@@ -119,11 +120,12 @@ public class RoomSetupManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(response.Data))
         {
-            PopulateUIButtons(response.Data);
+            await PopulateUIButtons(response.Data);
+            GoToScene("GRLClient");
         }
     }
 
-    private void PopulateUIButtons(string responseData)
+    private async Task PopulateUIButtons(string responseData)
     {
         // Deserialize the JSON string directly into your RaceList model
         RaceList raceList = JsonConvert.DeserializeObject<RaceList>(responseData);

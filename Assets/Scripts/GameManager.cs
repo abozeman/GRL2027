@@ -360,82 +360,82 @@ namespace cryptokartz.Scripts.GameControllers
 
         void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ReadOnlySpan<byte> data)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
         {
-            throw new NotImplementedException();
+
         }
 
         void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner)
         {
-            throw new NotImplementedException();
+
         }
         #endregion
     }

@@ -17,39 +17,50 @@ public class LapData
     public float overLap;
     public float offTrack;
     public List<string> lapTimes = new();
-    
-    
 
     public LapData(string jsonString)
     {
-
-        Dictionary<string, string> lapData2 = CreateFromJSON("{\"LapData\":" + jsonString + "}");
-        Dictionary<string, string> lapData3 = CreateFromJSON(lapData2["LapData"]);
-
-        // "laptimes\": \"[1673094402.543392, 1673094419.1086211, 1673094434.249424, 1673094449.4291246, 1673094464.279381, 1673094481.5408165, 1673094496.1035337, 1673094510.894316]\"}"
-
-        type = lapData3["type"];
-        vid = lapData3["vid"];
-        trackId = lapData3["track_id"];
-        lap = int.Parse(lapData3["lap"]);
-        lapIsValid = bool.Parse(lapData3["lapIsInvalid"]);
-        //this.lapIsPerfect = bool.Parse(lapData3["lapIsPerfect"]);
-        invalidLapCount = int.Parse(lapData3["invalid_lap_count"]);
-        overLap = float.Parse(lapData3["overlap"]);
-        offTrack = float.Parse(lapData3["offtrack"]);
-
-        lapTimes = JsonConvert.DeserializeObject<List<string>>(lapData3["laptimes"]);
+        try
+        {
+            // Deserialize directly into this object instance
+            JsonConvert.PopulateObject(jsonString, this);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to parse Telemetry: {e.Message}");
+        }
     }
+
+    //public LapData(string jsonString)
+    //{
+
+    //    Dictionary<string, string> lapData2 = CreateFromJSON("{\"LapData\":" + jsonString + "}");
+    //    Dictionary<string, string> lapData3 = CreateFromJSON(lapData2["LapData"]);
+
+    //    // "laptimes\": \"[1673094402.543392, 1673094419.1086211, 1673094434.249424, 1673094449.4291246, 1673094464.279381, 1673094481.5408165, 1673094496.1035337, 1673094510.894316]\"}"
+
+    //    type = lapData3["type"];
+    //    vid = lapData3["vid"];
+    //    trackId = lapData3["track_id"];
+    //    lap = int.Parse(lapData3["lap"]);
+    //    lapIsValid = bool.Parse(lapData3["lapIsInvalid"]);
+    //    //this.lapIsPerfect = bool.Parse(lapData3["lapIsPerfect"]);
+    //    invalidLapCount = int.Parse(lapData3["invalid_lap_count"]);
+    //    overLap = float.Parse(lapData3["overlap"]);
+    //    offTrack = float.Parse(lapData3["offtrack"]);
+
+    //    lapTimes = JsonConvert.DeserializeObject<List<string>>(lapData3["laptimes"]);
+    //}
 
     /// <summary>
     /// Creates from JSON.
     /// </summary>
     /// <param name="jsonString">The json string.</param>
     /// <returns><![CDATA[Dictionary<string, string>]]></returns>
-    public Dictionary<string, string> CreateFromJSON(string jsonString)
-    {
-        return JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonString);
-    }
+    //public Dictionary<string, string> CreateFromJSON(string jsonString)
+    //{
+    //    return JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonString);
+    //}
 
     /// <summary>
     /// Get lap seconds.

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 243289972787600678}
   - component: {fileID: 8100606087918808376}
   - component: {fileID: 7967538332345275263}
+  - component: {fileID: 1462051563328525517}
   m_Layer: 0
   m_Name: Server_Runner
   m_TagString: Untagged
@@ -68,4 +69,22 @@ MonoBehaviour:
   _playerPrefab: {fileID: 5761771852899755725, guid: 85df15c9c62d7474cb76fb545ca7c802, type: 3}
   _liveCarPrefab: {fileID: 6944370793633180429, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
   _ghostCarPrefab: {fileID: 8037583279005038106, guid: 0ae1e5d30cf6ea04dac7112ca6cf0b28, type: 3}
-  _carPrefabs: []
+--- !u!114 &1462051563328525517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 117257135644494085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
+  SortKey: 1913886410
+  SendPriority: 1
+  EnableInterpolation: 1
+  Flags: 262146
+  NestedObjects: []
+  NetworkedBehaviours: []
+  ForceRemoteRenderTimeframe: 0
