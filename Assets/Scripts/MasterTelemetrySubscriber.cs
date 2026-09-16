@@ -28,6 +28,7 @@ namespace Assets.CryptoKartz.Scripts.Managers
         public float Velocity;
 
         public Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
+        public GameObject testCar;
 
 
         #region MQTT Client
@@ -86,17 +87,17 @@ namespace Assets.CryptoKartz.Scripts.Managers
         #region Subscription/Unsubscription
         protected override void SubscribeTopics()
         {
-            client.Subscribe(new string[] { string.Format("car/telemetry/vr/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            client.Subscribe(new string[] { string.Format("car/vracestate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            client.Subscribe(new string[] { string.Format("car/telemetry/json/echoliveracer1") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            //client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            //client.Subscribe(new string[] { string.Format("car/vracestate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
 
         }
 
         protected override void UnsubscribeTopics()
         {
-            client.Unsubscribe(new string[] { string.Format("car/telemetry/vr/{0}", "#") });
-            client.Unsubscribe(new string[] { string.Format("car/lapupdate/{0}", "#") });
-            client.Unsubscribe(new string[] { string.Format("car/vracestate/{0}", "#") });
+            //client.Unsubscribe(new string[] { string.Format("car/telemetry/vr/{0}", "#") });
+            //client.Unsubscribe(new string[] { string.Format("car/lapupdate/{0}", "#") });
+            //client.Unsubscribe(new string[] { string.Format("car/vracestate/{0}", "#") });
         }
 
 
@@ -114,8 +115,11 @@ namespace Assets.CryptoKartz.Scripts.Managers
             else
             {
                 Debug.Log("MasterTelemetrySubscriber Disbaled Itself...");
-                this.gameObject.SetActive(false);
+                //this.gameObject.SetActive(false);
             }
+
+
+           
 
 
         }
@@ -139,14 +143,16 @@ namespace Assets.CryptoKartz.Scripts.Managers
         private void handleTelemetryData(TelemetryData telemetryData)
         {
 
+            var vid = "echoliveracer1" ;
+
             //Get The Raw Measurement First
             masterPosition = new Vector3(telemetryData.posX, telemetryData.posY, telemetryData.posZ);
             masterRotation = new Quaternion(telemetryData.rotX, telemetryData.rotY, telemetryData.rotZ, telemetryData.rotW);
 
-            if (cars.ContainsKey(telemetryData.vid))
+            if (cars.ContainsKey(vid))
             {
-                cars[telemetryData.vid].transform.position = masterPosition;
-                cars[telemetryData.vid].transform.rotation = masterRotation;
+                cars[vid].transform.position = masterPosition;
+                cars[vid].transform.rotation = masterRotation;
             }
             else
             {
@@ -167,7 +173,11 @@ namespace Assets.CryptoKartz.Scripts.Managers
         protected override void DecodeMessage(string topic, byte[] message)
         {
 
-            if (cars.Count == 0) return;
+            if (cars.Count == 0)
+            {
+                AddCar("echoliveracer1", testCar);
+                //return;
+            }
 
             var vid = topic.Split('/')[3];
             Debug.Log("vid msgRaw: " + vid);
