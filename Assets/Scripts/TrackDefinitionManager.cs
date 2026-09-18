@@ -1,11 +1,12 @@
-using UnityEngine;
+using Assets.GRL.Scripts.Models;
 using Fusion;
-using RestClient.Scripts.Clients;
 using Meta.XR.MRUtilityKit;
+using RestClient.Scripts.Clients;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
 {
@@ -29,14 +30,13 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
     [Capacity(60)]
     public NetworkArray<Vector2> InteriorCoordinates { get; }
     [Networked] public int InteriorCoordinatesLength { get; set; }
+
     [Networked]
     [Capacity(4)]
     public NetworkArray<Vector2> StartlineCoordinates { get; }
     [Networked] public int StartlineCoordinatesLength { get; set; }
 
     public readonly List<ITrackDefinitionManager> m_trackDefinitionReadyListener = new();
-
-
 
     public float renderDelay { get; private set; } = .1f;
 
@@ -66,42 +66,40 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
         }
     }
 
-    public void OnTrackDefinitionUpdate(TrackDefinition m_trackDefinition)
+    public void OnTrackDefinitionUpdate(TrackDefinition trackDefinition)
     {
         ExteriorCoordinates.Clear();
         InteriorCoordinates.Clear();
         StartlineCoordinates.Clear();
 
-        if (m_trackDefinition == null) return;
+        if (trackDefinition == null) return;
 
-        if (m_trackDefinition.geometry.coordinates[0].Length > 0)
+        if (trackDefinition.OuterBoundary != null && trackDefinition.OuterBoundary.Length > 0)
         {
-            ExteriorCoordinatesLength = m_trackDefinition.geometry.coordinates[0].Length;
+            ExteriorCoordinatesLength = trackDefinition.OuterBoundary.Length;
             for (var i = 0; i < ExteriorCoordinatesLength; i++)
             {
-                ExteriorCoordinates.Set(i, new Vector2(m_trackDefinition.geometry.coordinates[0][i][0], m_trackDefinition.geometry.coordinates[0][i][1]));
+                ExteriorCoordinates.Set(i, trackDefinition.OuterBoundary[i]);
             }
         }
 
-        if (m_trackDefinition.geometry.coordinates[1].Length > 0)
+        if (trackDefinition.InnerBoundary != null && trackDefinition.InnerBoundary.Length > 0)
         {
-            InteriorCoordinatesLength = m_trackDefinition.geometry.coordinates[1].Length;
+            InteriorCoordinatesLength = trackDefinition.InnerBoundary.Length;
             for (var i = 0; i < InteriorCoordinatesLength; i++)
             {
-                InteriorCoordinates.Set(i, new Vector2(m_trackDefinition.geometry.coordinates[1][i][0], m_trackDefinition.geometry.coordinates[1][i][1]));
+                InteriorCoordinates.Set(i, trackDefinition.InnerBoundary[i]);
             }
         }
 
-        if (m_trackDefinition.geometry.coordinates[2].Length > 0)
+        if (trackDefinition.StartLine != null && trackDefinition.StartLine.Length > 0)
         {
-            StartlineCoordinatesLength = m_trackDefinition.geometry.coordinates[2].Length;
+            StartlineCoordinatesLength = trackDefinition.StartLine.Length;
             for (var i = 0; i < StartlineCoordinatesLength; i++)
             {
-                StartlineCoordinates.Set(i, new Vector2(m_trackDefinition.geometry.coordinates[2][i][0], m_trackDefinition.geometry.coordinates[2][i][1]));
+                StartlineCoordinates.Set(i, trackDefinition.StartLine[i]);
             }
         }
-
-
     }
 
     public TrackDefinition GetTrackDefinition()
@@ -109,63 +107,44 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
         return GetTrackDefinition(ExteriorCoordinates, InteriorCoordinates, StartlineCoordinates, ExteriorCoordinatesLength, InteriorCoordinatesLength, StartlineCoordinatesLength);
     }
 
-    public TrackDefinition GetTrackDefinition(NetworkArray<Vector2> _exteriorCoordinates, NetworkArray<Vector2> _interiorCoordinates, NetworkArray<Vector2> _startlineCoordinates, int _exteriorCoordinatesLength, int _interiorCoordinatesLength, int _startlineCoordinatesLength)
+    public TrackDefinition GetTrackDefinition(
+        NetworkArray<Vector2> _exteriorCoordinates,
+        NetworkArray<Vector2> _interiorCoordinates,
+        NetworkArray<Vector2> _startlineCoordinates,
+        int _exteriorCoordinatesLength,
+        int _interiorCoordinatesLength,
+        int _startlineCoordinatesLength)
     {
         TrackDefinition trackDefinition = new TrackDefinition();
-        trackDefinition.geometry = new Geometry();
-        trackDefinition.properties = new Properties();
 
-        var elrpc = _exteriorCoordinatesLength;
-        var ilrpc = _interiorCoordinatesLength;
-        var slrpc = _startlineCoordinatesLength;
-
-        trackDefinition.geometry.coordinates = new float[3][][] {
-            new float[elrpc][],
-            new float[ilrpc][],
-            new float[slrpc][],
-        };
-
-
-        try
+        if (_exteriorCoordinatesLength > 0)
         {
-            if (_exteriorCoordinatesLength > 0)
+            trackDefinition.OuterBoundary = new Vector2[_exteriorCoordinatesLength];
+            for (var i = 0; i < _exteriorCoordinatesLength; i++)
             {
-                for (var i = 0; i < _exteriorCoordinatesLength; i++)
-                {
-                    trackDefinition.geometry.coordinates[0][i] = new float[2];
-                    trackDefinition.geometry.coordinates[0][i][0] = _exteriorCoordinates[i].x;
-                    trackDefinition.geometry.coordinates[0][i][1] = _exteriorCoordinates[i].y;
-                }
+                trackDefinition.OuterBoundary[i] = _exteriorCoordinates[i];
             }
-        }
-        catch (System.Exception e)
-        {
-            Debug.Log(e.Message);
         }
 
         if (_interiorCoordinatesLength > 0)
         {
+            trackDefinition.InnerBoundary = new Vector2[_interiorCoordinatesLength];
             for (var i = 0; i < _interiorCoordinatesLength; i++)
             {
-                trackDefinition.geometry.coordinates[1][i] = new float[2];
-                trackDefinition.geometry.coordinates[1][i][0] = _interiorCoordinates[i].x;
-                trackDefinition.geometry.coordinates[1][i][1] = _interiorCoordinates[i].y;
+                trackDefinition.InnerBoundary[i] = _interiorCoordinates[i];
             }
         }
 
         if (_startlineCoordinatesLength > 0)
         {
+            trackDefinition.StartLine = new Vector2[_startlineCoordinatesLength];
             for (var i = 0; i < _startlineCoordinatesLength; i++)
             {
-                trackDefinition.geometry.coordinates[2][i] = new float[2];
-                trackDefinition.geometry.coordinates[2][i][0] = _startlineCoordinates[i].x;
-                trackDefinition.geometry.coordinates[2][i][1] = _startlineCoordinates[i].y;
+                trackDefinition.StartLine[i] = _startlineCoordinates[i];
             }
         }
 
         return trackDefinition;
-
-
     }
 
     void ITrackAPI.OnTrackDefinitionReceived(TrackDefinition trackDefinition)
@@ -174,12 +153,8 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
         OnTrackDefinitionUpdate(m_trackDefinition);
         if (m_trackDefinition != null)
         {
-            foreach (var listener in m_trackDefinitionReadyListener)
-            {
-                NotifyTrackDefinitionReadyListener(LevelId);
-                Debug.Log("Notified listener of track definition ready.");
-
-            }
+            NotifyTrackDefinitionReadyListener(LevelId);
+            Debug.Log("Notified listener of track definition ready.");
         }
     }
 
@@ -189,7 +164,6 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
 
         if (Runner.IsServer)
         {
-
             RestClientTrackGenerator.RegisterGetTrackDefinitionCompleteListener(this);
 
             try
@@ -198,28 +172,17 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
                 {
                     RestClientTrackGenerator.GetTrackDefinition(TrackId);
                 }
-
             }
             catch (System.Exception e)
             {
                 Debug.Log(e.Message);
             }
-        } else
-        {
-
         }
-       
     }
 
-    /// <summary>
-    /// Fixed update network.
-    /// </summary>
     public override void FixedUpdateNetwork()
     {
-        if(!Runner.IsServer)
-        {
-            return;
-        }
+        if (!Runner.IsServer) return;
 
         foreach (string propertyName in _changes.DetectChanges(this))
         {
@@ -229,37 +192,25 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
                     m_trackDefinition = GetTrackDefinition(ExteriorCoordinates, InteriorCoordinates, StartlineCoordinates, ExteriorCoordinatesLength, InteriorCoordinatesLength, StartlineCoordinatesLength);
                     if (m_trackDefinition != null)
                     {
-                        foreach (var listener in m_trackDefinitionReadyListener)
-                        {
-                            NotifyTrackDefinitionReadyListener(LevelId);
-                            Debug.Log("Notified listener of track definition ready.");
-                            
-                        }
+                        NotifyTrackDefinitionReadyListener(LevelId);
+                        Debug.Log("Notified listener of track definition ready.");
                     }
-
                     break;
+
                 case nameof(TrackId):
                     try
                     {
                         RestClientTrackGenerator.GetTrackDefinition(TrackId);
-
                     }
                     catch (System.Exception e)
                     {
                         Debug.Log(e.Message);
                     }
                     break;
-
             }
         }
-       
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, InvokeLocal = false)]
-    public void RPC_ReceivedTrackDefinition()
-    {
-    }
-
-
-
+    public void RPC_ReceivedTrackDefinition() { }
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-namespace Assets.CryptoKartz.Scripts.Utils
+namespace Assets.GRL.Scripts.Utils
 {
     public class DedicatedServerConfig
     {

@@ -1,5 +1,5 @@
-using Assets.CryptoKartz.Scripts.managers;
-using Assets.CryptoKartz.Scripts.Utils;
+using Assets.GRL.Scripts.managers;
+using Assets.GRL.Scripts.Models;
 using Fusion;
 using Fusion.Sockets;
 using System;
@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using Application = UnityEngine.Application;
 
-namespace Assets.CryptoKartz.Scripts.Managers
+namespace Assets.GRL.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class ServerManager : ServerManagerBaseNetwork, INetworkRunnerCallbacks
@@ -24,7 +24,7 @@ namespace Assets.CryptoKartz.Scripts.Managers
         private Dictionary<string, NetworkRunner> _activeRaces = new Dictionary<string, NetworkRunner>();
 
         // Your Flask API URL (Update this to your actual server IP/Domain when deployed)
-        private readonly string API_BASE_URL = "http://localhost:8001/api";
+        private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
         private SceneRef sRef;
 
 
@@ -128,8 +128,12 @@ namespace Assets.CryptoKartz.Scripts.Managers
             // Parse Master Agent Command
             CreateRaceTrackConfig config = new CreateRaceTrackConfig(msg);
 
-            string newSessionName = config.SessionName;
-            string targetLobby = config.LobbyName;
+            System.Random random = new System.Random();
+
+            string newSessionName = config.SessionName + random.Next(0, 1000001).ToString();
+            string targetLobby = config.LobbyName + random.Next(0, 1000001).ToString();
+            string trackId = config.TrackId;
+
 
             // FIX: Ensure valid strings before starting
             if (string.IsNullOrEmpty(newSessionName) || string.IsNullOrEmpty(targetLobby))
@@ -167,8 +171,9 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
                 _activeRaces.Add(newSessionName, newRaceRunner);
 
-                int trackLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
-                StartCoroutine(RegisterRaceInDatabaseCoroutine(newSessionName, targetLobby, trackLevelId));
+                //int trackLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
+                string trackLevelId = config.RacePlatformLevel;
+                StartCoroutine(RegisterRaceInDatabaseCoroutine(newSessionName, targetLobby, trackLevelId, trackId));
             }
             else
             {
@@ -207,11 +212,14 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
         #region Database API Calls
 
-        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(string roomName, string lobbyName, int trackLevelId)
+        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(string roomName, string lobbyName, string trackLevelId, string trackId)
         {
             string url = $"{API_BASE_URL}/races/create";
+            Debug.LogError($"[Database] url : {url}");
 
-            string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":{trackLevelId}}}";
+            string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":{trackLevelId}, \"track_id\":\"{trackId}\"}}";
+            Debug.LogError($"[Database] jsonPayload : {jsonPayload}");
+
 
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
             {

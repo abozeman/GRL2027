@@ -5,7 +5,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 using M2MqttUnity;
 using Fusion;
 
-namespace Assets.CryptoKartz.Scripts.Managers
+namespace Assets.GRL.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class CarTelemetrySubscriber : M2MqttUnityClientNetwork

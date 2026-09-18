@@ -5,7 +5,7 @@ using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Assets.CryptoKartz.Scripts.Player
+namespace Assets.GRL.Scripts.Player
 {
     public class PlayerInputProvider : NetworkBehaviour, INetworkRunnerCallbacks, IBeforeUpdate
     {

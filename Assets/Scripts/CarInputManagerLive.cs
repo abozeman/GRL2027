@@ -1,10 +1,10 @@
-﻿using Assets.CryptoKartz.Scripts.Managers;
+﻿using Assets.GRL.Scripts.Managers;
 using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-namespace Assets.CryptoKartz.Scripts
+namespace Assets.GRL.Scripts
 {
     public class CarInputManagerLive : NetworkBehaviour, INetworkRunnerCallbacks
     {

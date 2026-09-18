@@ -16,7 +16,7 @@ public class CreateCarConfig
         try
         {
 
-            var obj = JsonConvert.DeserializeObject<CreateRaceTrackConfig>(jsonString);
+            var obj = JsonConvert.DeserializeObject<CreateCarConfig>(jsonString);
             this.RacePlatformLevel = obj.RacePlatformLevel;
             //this.trackId = obj.trackId;
 

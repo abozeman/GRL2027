@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Fusion.Sockets;
 using Fusion;
-using Assets.CryptoKartz.Scripts.Utils;
+using Assets.GRL.Scripts.Utils;
 using M2MqttUnity;
 
-namespace Assets.CryptoKartz.Scripts.managers
+namespace Assets.GRL.Scripts.managers
 {
 
     public abstract class ClientManagerBase : Fusion.SimulationBehaviour

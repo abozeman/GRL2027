@@ -5,10 +5,10 @@ using UnityEngine;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using M2MqttUnity;
 using Fusion;
-using Assets.CryptoKartz.Scripts.Utils;
+using Assets.GRL.Scripts.Utils;
 using System.Runtime.ConstrainedExecution;
 
-namespace Assets.CryptoKartz.Scripts.Managers
+namespace Assets.GRL.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class CarControlDataLivePublisher : M2MqttUnityClientNetwork

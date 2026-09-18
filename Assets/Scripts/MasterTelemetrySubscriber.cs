@@ -1,4 +1,4 @@
-using Assets.CryptoKartz.Scripts.Utils;
+using Assets.GRL.Scripts.Utils;
 using Fusion;
 using Fusion.Sockets;
 using M2MqttUnity;
@@ -10,7 +10,7 @@ using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
-namespace Assets.CryptoKartz.Scripts.Managers
+namespace Assets.GRL.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class MasterTelemetrySubscriber : M2MqttUnityClientNetwork, INetworkRunnerCallbacks
@@ -151,8 +151,8 @@ namespace Assets.CryptoKartz.Scripts.Managers
 
             if (cars.ContainsKey(vid))
             {
-                cars[vid].transform.position = masterPosition;
-                cars[vid].transform.rotation = masterRotation;
+                cars[vid].transform.localPosition = masterPosition;
+                cars[vid].transform.localRotation = masterRotation;
             }
             else
             {

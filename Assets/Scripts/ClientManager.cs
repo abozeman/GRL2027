@@ -1,12 +1,12 @@
-using Assets.CryptoKartz.Scripts.managers;
-using Assets.CryptoKartz.Scripts.Utils;
+using Assets.GRL.Scripts.managers;
+using Assets.GRL.Scripts.Utils;
 using Fusion;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Application = UnityEngine.Application;
 
-namespace Assets.CryptoKartz.Scripts.Managers
+namespace Assets.GRL.Scripts.Managers
 {
 
     public class ClientManager : ClientManagerBase

@@ -1,4 +1,4 @@
-using Assets.CryptoKartz.Scripts.Managers;
+using Assets.GRL.Scripts.Managers;
 using cryptokartz.Scripts.Player;
 using Fusion;
 using Fusion.Sockets;

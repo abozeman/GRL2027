@@ -639,9 +639,9 @@ Transform:
   m_GameObject: {fileID: 8525085160519899942}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.89419633, z: 0, w: 0.44767505}
-  m_LocalPosition: {x: 0.75686824, y: 0, z: -1.3873607}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.06, y: 0.06, z: 0.06}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3038073295843088633}
   - {fileID: 4898020828217918230}
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8525085160519899942}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6297125a567c1ae41b18172f93eaf0b6, type: 3}
   m_Name: 
@@ -731,7 +731,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8525085160519899942}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3cd0c54570f4f047a7febe15ea0002c, type: 3}
   m_Name: 
@@ -771,4 +771,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::cryptokartz.Scripts.Car.CarDataNetwork
   _LevelId: 0
   _ColorId: 0
-  _Vid: 
+  _Vid: echoliveracer1
