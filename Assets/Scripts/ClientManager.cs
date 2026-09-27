@@ -18,17 +18,20 @@ namespace Assets.GRL.Scripts.Managers
         protected async Task Start()
         {
             // Start the client
-            _ = StartClient();
+            //_ = StartClient();
         }
 
 
-        public async Task<StartGameResult> StartClient()
+        public async Task<StartGameResult> StartClient(string lobbyName, string raceName)
         {
             sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
 
             int loadGRLTask = await LoadGRLAsync(sRef);
 
-            StartGameResult startGRLTask = await StartSessionAsync("GRLGame", sRef);
+            //Somehow we need to wait for the scene to load before starting the session, otherwise it will fail.
+            //also the raceName needs to be fetched from the DB or passed in as a parameter, from the UI Button
+
+            StartGameResult startGRLTask = await StartSessionAsync(raceName, lobbyName, sRef);
             return startGRLTask;
         }
 
@@ -38,11 +41,11 @@ namespace Assets.GRL.Scripts.Managers
             return 1;
         }
 
-        public async Task<StartGameResult> StartSessionAsync(string sessionName, SceneRef scene) // assume we return an int from this long running operation 
+        public async Task<StartGameResult> StartSessionAsync(string raceName, string lobbyName, SceneRef scene) // assume we return an int from this long running operation 
         {
             runnerClient = GetRunner("Client");
 
-            var result = await StartSession(runnerClient, GameMode.Client, sessionName, "GRLOrlandoDev", scene);
+            var result = await StartSession(runnerClient, GameMode.Client, raceName, lobbyName, scene);
 
             // Check if all went fine
             if (result.Ok)

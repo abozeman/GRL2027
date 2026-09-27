@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fusion;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace M2MqttUnity
     /// <summary>
     /// Fusion NetworkBehaviour MQTT client
     /// </summary>
+    [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class M2MqttUnityClientNetwork : Fusion.SimulationBehaviour
     {
 
@@ -56,6 +58,26 @@ namespace M2MqttUnity
         /// </summary>
         public event Action ConnectionFailed;
 
+        public void Spawned()
+        {
+            Debug.LogWarning("M2MqttUnityClientNetwork Enter Spawned.");
+
+
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Debug.LogWarning("Multiple instances of M2MqttUnityClientNetwork detected. Destroying the new one.");
+                Destroy(this);
+                return;
+            }
+            if (autoConnect)
+            {
+                Connect();
+            }
+        }
 
 
         /// <summary>

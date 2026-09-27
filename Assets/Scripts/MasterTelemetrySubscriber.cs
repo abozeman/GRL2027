@@ -180,14 +180,15 @@ namespace Assets.GRL.Scripts.Managers
             }
 
             var vid = topic.Split('/')[3];
-            Debug.Log("vid msgRaw: " + vid);
+            //Debug.Log("vid msgRaw: " + vid);
 
             if (!cars.ContainsKey(vid)) return;
+
 
             try
             {
                 string msgRaw = System.Text.Encoding.UTF8.GetString(message);
-                Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgRaw);
+                //Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgRaw);
 
                 if (topic.Contains("telemetry"))
                 {

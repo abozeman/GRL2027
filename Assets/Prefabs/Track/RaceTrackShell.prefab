@@ -100,7 +100,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6860906129467054461}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5da52d4fa7be6b94285865aa9ae33d69, type: 3}
+  m_Script: {fileID: 11500000, guid: b30f01bde682a23428722038e78d078f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.ERLTrackVisualsManagerV2
   TrackExterior: {fileID: 3921426343606308411, guid: 4a95fe3b422831c45becbc8926ee7505, type: 3}
@@ -109,3 +109,4 @@ MonoBehaviour:
   TrackSurface: {fileID: 2862788345809905930, guid: 93cc4cd6cfb69584f905c2ea45fd6097, type: 3}
   trackIsRendered: 0
   trackIsReady: 0
+  isTestMode: 1

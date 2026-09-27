@@ -14,12 +14,13 @@ public class LiveCarSpawnManager : NetworkBehaviour
     int _colorId;
     string _vid;
     GameObject _trackPlatform;
-    public bool isTestMode { get; set; } = true;
+    public bool isTestMode = false;
 
 
     public override void Spawned()
     {
-        if (!Runner.IsServer  || isTestMode)
+
+        if (!Object.Runner.IsServer  || isTestMode)
         {
             //GetComponent<CarInputManagerLive>().enabled = true;
             //GetComponent<CarTelemetrySubscriber>().enabled = false;
@@ -35,6 +36,7 @@ public class LiveCarSpawnManager : NetworkBehaviour
             _trackPlatform = GameObject.Find(objFind);
             transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+            //_trackPlatform.GetComponent<TrackDefinitionManager>().TrackId = );
         }
         else
         {

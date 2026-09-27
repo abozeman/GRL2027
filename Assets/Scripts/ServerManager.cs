@@ -91,6 +91,7 @@ namespace Assets.GRL.Scripts.Managers
                 {
                     var result = await CreateNewRaceRoom(msg);
                     Debug.Log("StartServer Result: " + result);
+
                 }
                 else if (topic.Contains("server/manager/close_race"))
                 {
@@ -131,7 +132,7 @@ namespace Assets.GRL.Scripts.Managers
             System.Random random = new System.Random();
 
             string newSessionName = config.SessionName + random.Next(0, 1000001).ToString();
-            string targetLobby = config.LobbyName + random.Next(0, 1000001).ToString();
+            string targetLobby = config.LobbyName;
             string trackId = config.TrackId;
 
 
@@ -174,11 +175,15 @@ namespace Assets.GRL.Scripts.Managers
                 //int trackLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
                 string trackLevelId = config.RacePlatformLevel;
                 StartCoroutine(RegisterRaceInDatabaseCoroutine(newSessionName, targetLobby, trackLevelId, trackId));
+
+                // Optionally, you can send a confirmation message back to the Master Agent or log it
+
+
             }
             else
             {
                 Debug.LogError($"[Omnibus] Error starting room {newSessionName}: {result.ShutdownReason}");
-                //newRaceRunner.Disconnect();
+                //newRaceRunner.d();
             }
 
             return result;
@@ -215,10 +220,10 @@ namespace Assets.GRL.Scripts.Managers
         private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(string roomName, string lobbyName, string trackLevelId, string trackId)
         {
             string url = $"{API_BASE_URL}/races/create";
-            Debug.LogError($"[Database] url : {url}");
+            Debug.Log($"[Database] url : {url}");
 
             string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":{trackLevelId}, \"track_id\":\"{trackId}\"}}";
-            Debug.LogError($"[Database] jsonPayload : {jsonPayload}");
+            Debug.Log($"[Database] jsonPayload : {jsonPayload}");
 
 
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))

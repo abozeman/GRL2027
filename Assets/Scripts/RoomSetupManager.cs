@@ -1,3 +1,4 @@
+using Assets.GRL.Scripts.Managers;
 using Assets.Scripts.Models;
 using Meta.XR.MRUtilityKit;
 using Newtonsoft.Json;
@@ -16,7 +17,8 @@ public class RoomSetupManager : MonoBehaviour
     private string baseUrl = "http://192.168.2.49:8001";
     public GameObject raceUIButtonContainer; // Assign this in the Unity Inspector
     public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
-    public GameObject clientManager; // Assign this in the Unity Inspector
+    public GameObject _targetButton { get; set; } // Assign this in the Unity Inspector
+    //public GameObject clientManager; // Assign this in the Unity Inspector
 
 
     private async void Start()
@@ -121,7 +123,10 @@ public class RoomSetupManager : MonoBehaviour
         if (!string.IsNullOrEmpty(response.Data))
         {
             await PopulateUIButtons(response.Data);
-            GoToScene("GRLClient");
+            //GoToScene("GRLClient");
+
+            _targetButton.GetComponent<GRLRaceButtonClickHandller>().Invoke("HandleClick", 0f);
+
         }
     }
 
@@ -137,10 +142,17 @@ public class RoomSetupManager : MonoBehaviour
             // Iterate through the array to access individual Race properties
             foreach (Race race in raceList.data)
             {
-                Debug.Log($"Lobby: {race.lobby_name} | Room: {race.room_name} | Status: {race.status}");
+                Debug.Log($"Lobby: {race.lobby_name} | Room: {race.room_name} | Status: {race.status} | TrackId: {race.track_id}");
 
                 // Instantiate the race button prefab
                 GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
+                raceButton.GetComponent<GRLRaceButtonClickHandller>()._raceInfo = race;
+                raceButton.AddComponent<ClientManager>(); // Add the ClientManager component to the button
+
+                if (_targetButton == null)
+                {
+                    _targetButton = raceButton; // Assign the first button as the target if not already set
+                }
 
                 // Highly recommended for UI elements to prevent weird stretching
                 raceButton.transform.localScale = Vector3.one;
@@ -172,6 +184,7 @@ public class RoomSetupManager : MonoBehaviour
             }
 
             // TODO: Populate your scrollable UI panel with this list
+
         }
     }
 

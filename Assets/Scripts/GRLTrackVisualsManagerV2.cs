@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using static Unity.Collections.Unicode;
 
 namespace Assets.CryptoKartz.Scripts
 {
@@ -35,11 +36,14 @@ namespace Assets.CryptoKartz.Scripts
 
         public float renderDelay { get; private set; } = .1f;
 
-        public bool isTestMode { get; set; } = true;
+        public bool isTestMode = false;
 
         public override void Spawned()
         {
-            if (!Runner.IsServer || isTestMode)
+
+            
+
+            if (!Object.Runner.IsServer || isTestMode)
             {
                 _trackDefinitionManager = transform.GetComponent<TrackDefinitionManager>();
                 _trackDefinitionManager.RegisterTrackDefinitionReadyListener(this);
@@ -60,6 +64,7 @@ namespace Assets.CryptoKartz.Scripts
         void ITrackDefinitionManager.OnTrackDefinitionReady(int trackLevelId)
         {
             trackIsRendered = false;
+            SetTrackIsReady();
         }
 
         private IEnumerator GetTrackDefinitionAsync()
