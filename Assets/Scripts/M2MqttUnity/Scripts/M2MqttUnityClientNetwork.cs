@@ -17,9 +17,6 @@ namespace M2MqttUnity
     public class M2MqttUnityClientNetwork : Fusion.SimulationBehaviour
     {
 
-        // 1. CREATE THE SINGLETON INSTANCE
-        public static M2MqttUnityClientNetwork Instance { get; private set; }
-
         // 2. CREATE A PUBLIC EVENT FOR INCOMING MESSAGES
         public event Action OnMessageReceived;
 
@@ -62,17 +59,6 @@ namespace M2MqttUnity
         {
             Debug.LogWarning("M2MqttUnityClientNetwork Enter Spawned.");
 
-
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-            else
-            {
-                Debug.LogWarning("Multiple instances of M2MqttUnityClientNetwork detected. Destroying the new one.");
-                Destroy(this);
-                return;
-            }
             if (autoConnect)
             {
                 Connect();
