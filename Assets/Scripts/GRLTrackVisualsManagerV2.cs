@@ -82,7 +82,7 @@ namespace Assets.CryptoKartz.Scripts
                                             && m_TrackStartline != null && m_TrackStartline.GetComponent<LineRenderer>() != null);
 
             SetTrackIsReady();
-            Debug.Log("Track is now ready to render a definition.");
+            //Debug.Log("Track is now ready to render a definition.");
             yield return true;
         }
 
@@ -161,7 +161,7 @@ namespace Assets.CryptoKartz.Scripts
 
         public override void Render()
         {
-            if (!trackIsRendered && trackIsReady)
+            if (!Object.Runner.IsServer &&!trackIsRendered && trackIsReady)
             {
                 StartCoroutine(RenderTrack(m_trackDefinition, transform.localScale));
             }

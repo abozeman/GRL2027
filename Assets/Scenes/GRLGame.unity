@@ -129,7 +129,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2168714008141207826, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
       propertyPath: isTestMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5243160247351971051, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
       propertyPath: RestClientTrackGenerator

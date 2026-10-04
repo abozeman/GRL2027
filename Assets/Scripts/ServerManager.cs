@@ -113,8 +113,6 @@ namespace Assets.GRL.Scripts.Managers
 
         public override void FixedUpdateNetwork()
         {
-            base.Update();
-
             if (eventMessages.Count > 0)
             {
                 eventMessages.Clear();
@@ -154,7 +152,6 @@ namespace Assets.GRL.Scripts.Managers
             newRaceRunner.name = $"ServerRunner_{newSessionName}";
             newRaceRunner.ProvideInput = true;
             sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
-
 
             // Start the Fusion Session (Room) inside the specified Lobby
             var result = await StartSession(
@@ -210,6 +207,7 @@ namespace Assets.GRL.Scripts.Managers
                 CustomLobbyName = lobbyName,
                 SessionName = sessionName,
                 GameMode = gameMode,
+                Address = Fusion.Sockets.NetAddress.Any(0),
                 SceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = scene,
             });
