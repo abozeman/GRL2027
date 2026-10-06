@@ -50,7 +50,7 @@ namespace RestClient.Scripts.Clients
             };
 
             // send a post request
-            StartCoroutine(RestWebClient.Instance.HttpPost($"{baseUrl}/getTrackDefinition",
+            StartCoroutine(RestWebClient.Instance.HttpPost($"http://192.168.2.49:8001/getTrackDefinition",
                 JsonUtility.ToJson(new GetTrackDefinitionsRequest { trackId = _track_id }),
                 (r) => OnGetTrackDefinitionRequestComplete(r), new List<RequestHeader> { header }));
         }

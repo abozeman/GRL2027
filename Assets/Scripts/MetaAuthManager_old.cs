@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using Oculus.Platform;
 using Oculus.Platform.Models;
 using RestClient.Core;
@@ -8,27 +7,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Application = UnityEngine.Application;
 
-public class MetaAuthManager : MonoBehaviour
+public class MetaAuthManager_old : MonoBehaviour
 {
     private string loggedInUserId;
-
     [SerializeField]
     private string baseUrl = "http://192.168.2.49:8001";
 
-    [Header("Scene Routing")]
-    [Tooltip("The exact name of the next scene to load upon successful auth")]
-    public string nextSceneName = "GRLLobby";
-
     void Start()
     {
-#if UNITY_EDITOR
-        // 1. EDITOR BYPASS: Skip Meta hardware check and instantly mock a DB login
-        Debug.Log("[Auth] Running in Unity Editor. Bypassing Meta hardware entitlement.");
-        SyncUserWithDatabase("editor_mock_id_999", "EditorUser@test.com");
-#else
-        // 2. COMPILED CLIENT: Run the actual Meta Entitlement check
+        // Surround initialization with a try/catch block
         try
         {
+            // Asynchronous initialization does not block the main thread
             Core.AsyncInitialize().OnComplete(OnInitCallback);
         }
         catch (UnityException e)
@@ -36,10 +26,9 @@ public class MetaAuthManager : MonoBehaviour
             Debug.LogError("Platform failed to initialize: " + e.Message);
             HandleFailedEntitlement();
         }
-#endif
     }
 
-    private void OnInitCallback(Message msg)
+    private void OnInitCallback(Message<PlatformInitialize> msg)
     {
         if (msg.IsError)
         {
@@ -49,6 +38,7 @@ public class MetaAuthManager : MonoBehaviour
         else
         {
             Debug.Log("Meta Platform SDK initialized successfully.");
+            // Proceed to the entitlement check
             PerformEntitlementCheck();
         }
     }
@@ -68,18 +58,22 @@ public class MetaAuthManager : MonoBehaviour
         else
         {
             Debug.Log("Entitlement check passed!");
+            // User is verified, now retrieve their profile data
             GetLoggedInUser();
         }
     }
 
     private void HandleFailedEntitlement()
     {
-        Debug.LogError("User is not entitled to this application. Quitting.");
+        // TODO: Handle failure. You must handle this gracefully.
+        // E.g., show an error UI to the user and then quit the app.
+        Debug.LogError("User is not entitled to this application.");
         Application.Quit();
     }
 
     private void GetLoggedInUser()
     {
+        // Request the currently logged-in user's profile
         Users.GetLoggedInUser().OnComplete(OnGetLoggedInUserCallback);
     }
 
@@ -91,19 +85,24 @@ public class MetaAuthManager : MonoBehaviour
         }
         else
         {
+            // Extract the user data
             User user = msg.Data;
             loggedInUserId = user.ID.ToString();
-            string userName = user.OculusID;
+            string userName = user.OculusID; // The user's display name
 
             Debug.Log($"Successfully retrieved user. ID: {loggedInUserId}, Name: {userName}");
+
+            // Now that you have the user ID, call your backend API
             SyncUserWithDatabase(loggedInUserId, userName);
         }
     }
 
     private void SyncUserWithDatabase(string metaUserId, string metaUserName)
     {
+        // TODO: Call the API you already wrote.
+        // E.g., StartCoroutine(CallMyCustomAPI(metaUserId, metaUserName));
         Debug.Log($"Initiating API call to add user {metaUserId} to the database...");
-
+        // setup the request header
         RequestHeader header = new RequestHeader
         {
             Key = "Content-Type",
@@ -114,38 +113,27 @@ public class MetaAuthManager : MonoBehaviour
         {
             provider_name = "Meta",
             provider_user_id = metaUserId,
-            provider_email = metaUserName
+            provider_email = metaUserName // Assuming the username is used as email here
         });
 
         string apiUrl = $"{baseUrl}/api/auth/login";
 
-        //StartCoroutine(RestWebClient.Instance.HttpPost(apiUrl, jsonPayload,
-        //    (r) => OnRequestComplete(r), new List<RequestHeader> { header }));
+        Debug.Log($"[API DEBUG] URL IS EXACTLY: '{apiUrl}'");
 
+        // send a post request
         StartCoroutine(RestWebClient.Instance.HttpPost("http://192.168.2.49:8001/api/auth/login", jsonPayload,
-           (r) => OnRequestComplete(r), new List<RequestHeader> { header }));
+            (r) => OnRequestComplete(r), new List<RequestHeader> { header }));
     }
 
     void OnRequestComplete(Response response)
     {
-        Debug.Log($"[Database Auth] Status Code: {response.StatusCode}");
+        Debug.Log($"Status Code: {response.StatusCode}");
+        Debug.Log($"Data: {response.Data}");
+        Debug.Log($"Error: {response.Error}");
 
-        // If the Flask API returns 200 (Existing User) or 201 (New User Created)
-        if (response.StatusCode == 200 || response.StatusCode == 201)
-        {
-            Debug.Log("[Database Auth] Success! Transitioning to next scene...");
-            GoToScene(nextSceneName);
-        }
-        else
-        {
-            Debug.LogError($"[Database Auth] Failed. Error: {response.Error} | Data: {response.Data}");
-        }
-    }
+        //TODO: Handle the response appropriately. For example, check if the user was successfully added to the database and proceed accordingly.
 
-    public void GoToScene(string targetScene)
-    {
-        Debug.Log($"[Transition] Loading scene: {targetScene} asynchronously...");
-        SceneManager.LoadSceneAsync(targetScene);
+        GoToScene("GRLLobby");
     }
 
     public class GRLUser
@@ -154,4 +142,14 @@ public class MetaAuthManager : MonoBehaviour
         public string provider_user_id;
         public string provider_email;
     }
+
+    public void GoToScene(string nextSceneName)
+    {
+        Debug.Log($"[Transition] Attempting to load scene: {nextSceneName}");
+
+        // Load the scene asynchronously in the background to prevent VR freezing
+        SceneManager.LoadSceneAsync(nextSceneName);
+    }
+
 }
+

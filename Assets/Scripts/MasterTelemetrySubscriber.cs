@@ -1,4 +1,5 @@
 using Assets.GRL.Scripts.Utils;
+using Assets.Scripts.M2MqttUnity.Scripts;
 using Fusion;
 using Fusion.Sockets;
 using M2MqttUnity;
@@ -12,8 +13,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace Assets.GRL.Scripts.Managers
 {
-    [SimulationBehaviour(Modes = SimulationModes.Server)]
-    public class MasterTelemetrySubscriber : M2MqttUnityClientNetwork, INetworkRunnerCallbacks
+    public class MasterTelemetrySubscriber : MqttNetworkBehaviour
     {
         private List<string> eventMessages = new List<string>();
 
@@ -105,11 +105,11 @@ namespace Assets.GRL.Scripts.Managers
 
         #endregion
 
-        public void Spawned()
+        public override void Spawned()
         {
-            Runner.AddCallbacks(this);
             if (Runner.IsServer)
             {
+                base.Spawned();
                 Debug.Log("MasterTelemetrySubscriber Spawned & Started Connecting to broker...");
             }
             else
@@ -117,10 +117,6 @@ namespace Assets.GRL.Scripts.Managers
                 Debug.Log("MasterTelemetrySubscriber Disbaled Itself...");
                 //this.gameObject.SetActive(false);
             }
-
-
-           
-
 
         }
 
@@ -261,101 +257,6 @@ namespace Assets.GRL.Scripts.Managers
         {
 
         }
-
-        #region Network Callbacks
-        void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnConnectedToServer(NetworkRunner runner)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnSceneLoadDone(NetworkRunner runner)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner)
-        {
-
-        }
-
-        void INetworkRunnerCallbacks.OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ReadOnlySpan<byte> data)
-        {
-        }
-        #endregion
+        
     }
 }

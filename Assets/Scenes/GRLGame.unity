@@ -136,6 +136,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 990187200}
     - target: {fileID: 6700943458507327105, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
+      propertyPath: Flags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6700943458507327105, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
       propertyPath: SortKey
       value: 3451396124
       objectReference: {fileID: 0}
@@ -503,5 +507,5 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 780406800604189458}
-  - {fileID: 1585008792}
   - {fileID: 1302102730}
+  - {fileID: 1585008792}

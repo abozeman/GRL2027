@@ -50,7 +50,8 @@ MonoBehaviour:
   EnableInterpolation: 1
   Flags: 262146
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 3041769193311361419}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &3041769193311361419
 MonoBehaviour:

@@ -19,7 +19,7 @@ public class LiveCarSpawnManager : NetworkBehaviour
     public override void Spawned()
     {
 
-        if (!Object.Runner.IsServer)
+        if (Object.Runner.IsServer)
         {
             //GetComponent<CarInputManagerLive>().enabled = true;
             //GetComponent<CarTelemetrySubscriber>().enabled = false;

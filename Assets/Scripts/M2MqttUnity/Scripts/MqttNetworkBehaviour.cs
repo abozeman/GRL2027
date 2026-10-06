@@ -2,21 +2,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
-/// <summary>
-/// </summary>
-namespace M2MqttUnity
+namespace Assets.Scripts.M2MqttUnity.Scripts
 {
-    /// <summary>
-    /// Fusion NetworkBehaviour MQTT client
-    /// </summary>
-    [SimulationBehaviour(Modes = SimulationModes.Server)]
-    public class M2MqttUnityClientNetwork : Fusion.SimulationBehaviour
+    public class MqttNetworkBehaviour : NetworkBehaviour
     {
-
         // 2. CREATE A PUBLIC EVENT FOR INCOMING MESSAGES
         public event Action OnMessageReceived;
 
@@ -55,10 +49,8 @@ namespace M2MqttUnity
         /// </summary>
         public event Action ConnectionFailed;
 
-        public void Start()
+        public override void Spawned()
         {
-            Debug.LogWarning("M2MqttUnityClientNetwork Enter Spawned.");
-
             if (autoConnect)
             {
                 Connect();
