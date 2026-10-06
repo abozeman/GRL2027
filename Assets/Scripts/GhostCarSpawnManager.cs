@@ -16,7 +16,7 @@ public class GhostCarSpawnManager : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (!Runner.IsServer)
+        if (!Object.Runner.IsServer)
         {
             GetComponent<CarTelemetrySubscriber>().enabled = false;
 

@@ -14,13 +14,12 @@ public class LiveCarSpawnManager : NetworkBehaviour
     int _colorId;
     string _vid;
     GameObject _trackPlatform;
-    public bool isTestMode = false;
 
 
     public override void Spawned()
     {
 
-        if (!Object.Runner.IsServer  || isTestMode)
+        if (!Object.Runner.IsServer)
         {
             //GetComponent<CarInputManagerLive>().enabled = true;
             //GetComponent<CarTelemetrySubscriber>().enabled = false;

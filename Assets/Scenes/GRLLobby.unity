@@ -477,7 +477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0adba22fa4045148843cd48f48c7a99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.Managers.ClientManager
-  _runnerClientPrefab: {fileID: 0}
+  _runnerClientPrefab: {fileID: 3456802343237632205, guid: 146b653c38070b946b38832f6c26cecf, type: 3}
 --- !u!1 &937299632
 GameObject:
   m_ObjectHideFlags: 0
@@ -1094,7 +1094,7 @@ MonoBehaviour:
   _monoscopic: 0
   _sharpenType: 0
   _disableRecording: 0
-  _enableDynamicResolution: 0
+  _enableDynamicResolution: 1
   minDynamicResolutionScale: 1
   maxDynamicResolutionScale: 1
   quest2MinDynamicResolutionScale: 0.7
