@@ -450,6 +450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   raceUIButtonContainer: {fileID: 2134480856}
   raceButtonPrefab: {fileID: 688320000250573698, guid: 9fb3652628afd924aa3cd12cb9d5269e, type: 3}
+  WarehouseJSON: {fileID: 4900000, guid: 5d6d9d58454eed44c98659c6931abc3e, type: 3}
 --- !u!4 &889659517
 Transform:
   m_ObjectHideFlags: 0
@@ -2147,6 +2148,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 329217517183375623, guid: a7a9558bd7c454949bdd7889adbeaebe, type: 3}
+      propertyPath: SceneSettings.DataSource
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 329217517183375623, guid: a7a9558bd7c454949bdd7889adbeaebe, type: 3}
+      propertyPath: SceneSettings.LoadSceneOnStartup
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 329217517183375623, guid: a7a9558bd7c454949bdd7889adbeaebe, type: 3}
+      propertyPath: SceneSettings.SceneJsons.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 329217517183375623, guid: a7a9558bd7c454949bdd7889adbeaebe, type: 3}
+      propertyPath: 'SceneSettings.SceneJsons.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4900000, guid: 5d6d9d58454eed44c98659c6931abc3e, type: 3}
     - target: {fileID: 4260322372042255860, guid: a7a9558bd7c454949bdd7889adbeaebe, type: 3}
       propertyPath: m_Name
       value: MRUK

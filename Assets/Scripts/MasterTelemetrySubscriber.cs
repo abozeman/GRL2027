@@ -40,7 +40,8 @@ namespace Assets.GRL.Scripts.Managers
         /// <param name="clientId">The clientId.</param>
         public void SetClientId(string clientId)
         {
-            this.clientId = clientId;
+            int randomInt = UnityEngine.Random.Range(1, 10000);
+            this.clientId = clientId + randomInt;
         }
 
         /// <summary>
@@ -109,7 +110,8 @@ namespace Assets.GRL.Scripts.Managers
         {
             if (Runner.IsServer)
             {
-                base.Spawned();
+                SetClientId("MasterTelemetrySubscriber");
+                base.Connect();
                 Debug.Log("MasterTelemetrySubscriber Spawned & Started Connecting to broker...");
             }
             else
@@ -117,6 +119,10 @@ namespace Assets.GRL.Scripts.Managers
                 Debug.Log("MasterTelemetrySubscriber Disbaled Itself...");
                 //this.gameObject.SetActive(false);
             }
+
+
+           
+
 
         }
 
@@ -257,6 +263,6 @@ namespace Assets.GRL.Scripts.Managers
         {
 
         }
-        
+       
     }
 }

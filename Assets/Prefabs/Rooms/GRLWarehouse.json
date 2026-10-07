@@ -1,0 +1,161 @@
+{
+  "CoordinateSystem": "Unity",
+  "Rooms": [
+    {
+      "UUID": "84660000000000000000000000000000",
+      "RoomLayout": {
+        "FloorUuid": "84660000000000000000000000000001",
+        "CeilingUuid": "84660000000000000000000000000002",
+        "WallsUuid": [
+          "84660000000000000000000000000003",
+          "84660000000000000000000000000004",
+          "84660000000000000000000000000005",
+          "84660000000000000000000000000006"
+        ]
+      },
+      "Anchors": [
+        {
+          "UUID": "84660000000000000000000000000001",
+          "SemanticClassifications": [
+            "FLOOR"
+          ],
+          "Transform": {
+            "Translation": [0.0, 0.0, 0.0],
+            "Rotation": [270.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-6.1, -7.6],
+            "Max": [6.1, 7.6]
+          },
+          "PlaneBoundary2D": [
+            [6.1, 7.6],
+            [-6.1, 7.6],
+            [-6.1, -7.6],
+            [6.1, -7.6]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000002",
+          "SemanticClassifications": [
+            "CEILING"
+          ],
+          "Transform": {
+            "Translation": [0.0, 4.8, 0.0],
+            "Rotation": [90.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-6.1, -7.6],
+            "Max": [6.1, 7.6]
+          },
+          "PlaneBoundary2D": [
+            [6.1, 7.6],
+            [-6.1, 7.6],
+            [-6.1, -7.6],
+            [6.1, -7.6]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000003",
+          "SemanticClassifications": [
+            "WALL_FACE"
+          ],
+          "Transform": {
+            "Translation": [0.0, 2.4, 7.6],
+            "Rotation": [0.0, 180.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-6.1, -2.4],
+            "Max": [6.1, 2.4]
+          },
+          "PlaneBoundary2D": [
+            [6.1, 2.4],
+            [-6.1, 2.4],
+            [-6.1, -2.4],
+            [6.1, -2.4]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000004",
+          "SemanticClassifications": [
+            "WALL_FACE"
+          ],
+          "Transform": {
+            "Translation": [0.0, 2.4, -7.6],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-6.1, -2.4],
+            "Max": [6.1, 2.4]
+          },
+          "PlaneBoundary2D": [
+            [6.1, 2.4],
+            [-6.1, 2.4],
+            [-6.1, -2.4],
+            [6.1, -2.4]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000005",
+          "SemanticClassifications": [
+            "WALL_FACE"
+          ],
+          "Transform": {
+            "Translation": [-6.1, 2.4, 0.0],
+            "Rotation": [0.0, 90.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-7.6, -2.4],
+            "Max": [7.6, 2.4]
+          },
+          "PlaneBoundary2D": [
+            [7.6, 2.4],
+            [-7.6, 2.4],
+            [-7.6, -2.4],
+            [7.6, -2.4]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000006",
+          "SemanticClassifications": [
+            "WALL_FACE"
+          ],
+          "Transform": {
+            "Translation": [6.1, 2.4, 0.0],
+            "Rotation": [0.0, 270.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "PlaneBounds": {
+            "Min": [-7.6, -2.4],
+            "Max": [7.6, 2.4]
+          },
+          "PlaneBoundary2D": [
+            [7.6, 2.4],
+            [-7.6, 2.4],
+            [-7.6, -2.4],
+            [7.6, -2.4]
+          ]
+        },
+        {
+          "UUID": "84660000000000000000000000000007",
+          "SemanticClassifications": [
+            "STORAGE"
+          ],
+          "Transform": {
+            "Translation": [-4.0, 1.2, -2.0],
+            "Rotation": [0.0, 0.0, 0.0],
+            "Scale": [1.0, 1.0, 1.0]
+          },
+          "VolumeBounds": {
+            "Min": [-2.0, -1.2, -6.0],
+            "Max": [2.0, 1.2, 6.0]
+          }
+        }
+      ]
+    }
+  ]
+}

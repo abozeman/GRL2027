@@ -22,7 +22,6 @@ public class LiveCarSpawnManager : NetworkBehaviour
         if (Object.Runner.IsServer)
         {
             //GetComponent<CarInputManagerLive>().enabled = true;
-            //GetComponent<CarTelemetrySubscriber>().enabled = false;
             //GetComponent<CarControlDataLivePublisher>().enabled = false;
 
             _levelId = Object.GetComponent<CarDataNetwork>().LevelId;
@@ -41,7 +40,6 @@ public class LiveCarSpawnManager : NetworkBehaviour
         else
         {
             //GetComponent<CarInputManagerLive>().enabled = false;
-            //GetComponent<CarTelemetrySubscriber>().enabled = true;
             //GetComponent<CarControlDataLivePublisher>().enabled = true;
         }
     }

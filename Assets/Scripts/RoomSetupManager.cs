@@ -18,7 +18,8 @@ public class RoomSetupManager : MonoBehaviour
     public GameObject raceUIButtonContainer; // Assign this in the Unity Inspector
     public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
     public GameObject _targetButton { get; set; } // Assign this in the Unity Inspector
-    //public GameObject clientManager; // Assign this in the Unity Inspector
+    public TextAsset WarehouseJSON;
+
 
 
     private async void Start()
@@ -62,8 +63,13 @@ public class RoomSetupManager : MonoBehaviour
     {
         try
         {
-            // In MRUK v200+, this async method handles the heavy lifting
-            var room = await MRUK.Instance.LoadSceneFromDevice();
+            // In MRUK v200+, this async method handles the heavy lifting  LoadSceneFromJsonString
+            //var room = await MRUK.Instance.LoadSceneFromDevice();
+
+            //For testing purposes, we can load a room from a JSON string instead of the device
+            //var room = await MRUK.Instance.LoadSceneFromJsonString(WarehouseJSON.text);
+            var json = WarehouseJSON.text;
+            var room = await MRUK.Instance.LoadSceneFromJsonString(json);
 
             // If the room object is not null, the headset had a saved room
             return room == LoadDeviceResult.Success;
@@ -125,7 +131,7 @@ public class RoomSetupManager : MonoBehaviour
             await PopulateUIButtons(response.Data);
             //GoToScene("GRLClient");
 
-            _targetButton.GetComponent<GRLRaceButtonClickHandller>().Invoke("HandleClick", 0f);
+            //_targetButton.GetComponent<GRLRaceButtonClickHandller>().Invoke("HandleClick", 0f);
 
         }
     }

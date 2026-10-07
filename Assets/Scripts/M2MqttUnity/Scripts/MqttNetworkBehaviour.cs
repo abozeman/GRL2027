@@ -25,7 +25,7 @@ namespace Assets.Scripts.M2MqttUnity.Scripts
         public bool autoConnect = true;
         public string mqttUserName = null;
         public string mqttPassword = null;
-        public string clientId = null;
+        public string clientId { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -53,6 +53,7 @@ namespace Assets.Scripts.M2MqttUnity.Scripts
         {
             if (autoConnect)
             {
+                
                 Connect();
             }
         }
@@ -284,7 +285,7 @@ namespace Assets.Scripts.M2MqttUnity.Scripts
             yield return new WaitForEndOfFrame();
 
             client.Settings.TimeoutOnConnection = timeoutOnConnection;
-            //string clientId = Guid.NewGuid().ToString();
+            string clientId = Guid.NewGuid().ToString();
             try
             {
                 client.Connect(clientId, mqttUserName, mqttPassword);

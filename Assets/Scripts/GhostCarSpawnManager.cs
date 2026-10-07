@@ -16,13 +16,13 @@ public class GhostCarSpawnManager : NetworkBehaviour
 
     public override void Spawned()
     {
+        _vid = Object.GetComponent<CarDataNetwork>().Vid;
+
         if (!Object.Runner.IsServer)
         {
-            GetComponent<CarTelemetrySubscriber>().enabled = false;
 
             _levelId = Object.GetComponent<CarDataNetwork>().LevelId;
             _colorId = Object.GetComponent<CarDataNetwork>().ColorId;
-            _vid = Object.GetComponent<CarDataNetwork>().Vid;
             _levelId = 1;
             //string objFind = $"TrackPlatformPlacementTool/TrackPlatformPlacementTarget/TrackPlatformContainer/RaceTrackShell{_levelId}";
             string objFind = $"RaceTrackShell{_levelId}";
@@ -30,13 +30,6 @@ public class GhostCarSpawnManager : NetworkBehaviour
             _trackPlatform = FindInRunnerScene(objFind);
             transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
-        }
-        else
-        {
-            _vid = Object.GetComponent<CarDataNetwork>().Vid;
-            var sub = GetComponent<CarTelemetrySubscriber>();
-            sub.vid = _vid;
-            sub.enabled = true;
         }
     }
 

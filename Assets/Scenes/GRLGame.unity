@@ -324,119 +324,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3692342758841036193, guid: 814497fe6b373ae4a99c7ee921286b1b, type: 3}
   m_PrefabInstance: {fileID: 1302102730}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1585008792
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.06
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 942937707417545270, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1746317061539311714, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4180487851149503529, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4180487851149503529, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: _carControlPublisher
-      value: 
-      objectReference: {fileID: 1585008794}
-    - target: {fileID: 6857537048276100602, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: _Vid
-      value: echoliveracer1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6944370793633180429, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: SortKey
-      value: 3094902360
-      objectReference: {fileID: 0}
-    - target: {fileID: 7336572456164633982, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: isTestMode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8525085160519899942, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-      propertyPath: m_Name
-      value: LiveCar
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
---- !u!1 &1585008793 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8525085160519899942, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-  m_PrefabInstance: {fileID: 1585008792}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1585008794 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1746317061539311714, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
-  m_PrefabInstance: {fileID: 1585008792}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1585008793}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3cd0c54570f4f047a7febe15ea0002c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.Managers.CarControlDataLivePublisher
 --- !u!1001 &780406800604189458
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -452,7 +339,7 @@ PrefabInstance:
     - target: {fileID: 3041769193311361419, guid: a8b5c3de4d243554aae84716cae073e2, type: 3}
       propertyPath: testCar
       value: 
-      objectReference: {fileID: 1585008793}
+      objectReference: {fileID: 0}
     - target: {fileID: 8114839684368693457, guid: a8b5c3de4d243554aae84716cae073e2, type: 3}
       propertyPath: m_Name
       value: MasterTelemetryProvider
@@ -508,4 +395,3 @@ SceneRoots:
   m_Roots:
   - {fileID: 780406800604189458}
   - {fileID: 1302102730}
-  - {fileID: 1585008792}

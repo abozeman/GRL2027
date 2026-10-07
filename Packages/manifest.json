@@ -4,6 +4,7 @@
     "com.meta.xr.sdk.core": "205.0.0",
     "com.meta.xr.sdk.interaction.ovr": "205.0.0",
     "com.meta.xr.sdk.platform": "205.0.0",
+    "com.meta.xr.simulator.synthenvbuilder": "60.0.1",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.dedicated-server": "2.0.2",
