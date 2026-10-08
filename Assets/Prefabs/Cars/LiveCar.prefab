@@ -757,6 +757,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe3bf382d9ab8f947ba0cbf14b88850f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LiveCarSpawnManager
+  _levelId: 0
+  _colorId: 0
+  _vid: 
 --- !u!114 &6857537048276100602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,6 +772,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96c9c70caa8df66438804953c4e42be3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::cryptokartz.Scripts.Car.CarDataNetwork
-  _LevelId: 0
-  _ColorId: 0
-  _Vid: echoliveracer1
+  _LevelId: 1
+  _ColorId: 2
+  _Vid: grlracer1

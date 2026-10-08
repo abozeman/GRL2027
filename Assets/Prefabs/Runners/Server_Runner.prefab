@@ -88,3 +88,4 @@ MonoBehaviour:
   _playerPrefab: {fileID: 5761771852899755725, guid: 85df15c9c62d7474cb76fb545ca7c802, type: 3}
   _liveCarPrefab: {fileID: 6944370793633180429, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
   _ghostCarPrefab: {fileID: 8037583279005038106, guid: 0ae1e5d30cf6ea04dac7112ca6cf0b28, type: 3}
+  SessionName: 

@@ -26,9 +26,9 @@ namespace Assets.GRL.Scripts.Managers
         public bool IsOffTrack;
         public bool IsOverlapping;
         public float Velocity;
+        public string SessionName;
 
-        public Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
-        public GameObject testCar;
+        public Dictionary<string, GameObject> cars;
 
 
         #region MQTT Client
@@ -88,7 +88,9 @@ namespace Assets.GRL.Scripts.Managers
         #region Subscription/Unsubscription
         protected override void SubscribeTopics()
         {
-            client.Subscribe(new string[] { string.Format("car/telemetry/json/echoliveracer1") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
+            
+
+            client.Subscribe(new string[] { string.Format("car/telemetry/json/{0}/{1}", SessionName, "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
             //client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
             //client.Subscribe(new string[] { string.Format("car/vracestate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
 
@@ -108,9 +110,13 @@ namespace Assets.GRL.Scripts.Managers
 
         public override void Spawned()
         {
+
+
             if (Runner.IsServer)
             {
+                cars = new Dictionary<string, GameObject>();
                 SetClientId("MasterTelemetrySubscriber");
+                SessionName = Runner.SessionInfo.Name.ToLower();
                 base.Connect();
                 Debug.Log("MasterTelemetrySubscriber Spawned & Started Connecting to broker...");
             }
@@ -145,7 +151,8 @@ namespace Assets.GRL.Scripts.Managers
         private void handleTelemetryData(TelemetryData telemetryData)
         {
 
-            var vid = "echoliveracer1" ;
+            //var vid = "grlracer1";
+            var vid = telemetryData.vid;
 
             //Get The Raw Measurement First
             masterPosition = new Vector3(telemetryData.posX, telemetryData.posY, telemetryData.posZ);
@@ -175,14 +182,11 @@ namespace Assets.GRL.Scripts.Managers
         protected override void DecodeMessage(string topic, byte[] message)
         {
 
-            if (cars.Count == 0)
-            {
-                AddCar("echoliveracer1", testCar);
-                //return;
-            }
+            var vid = topic.Split('/')[4];
+            Debug.Log("vid msgRaw: " + vid);
 
-            var vid = topic.Split('/')[3];
-            //Debug.Log("vid msgRaw: " + vid);
+            string msgDebug = System.Text.Encoding.UTF8.GetString(message);
+            //Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgDebug);
 
             if (!cars.ContainsKey(vid)) return;
 

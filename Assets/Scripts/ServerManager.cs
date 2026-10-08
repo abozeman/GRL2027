@@ -1,11 +1,14 @@
 using Assets.GRL.Scripts.managers;
 using Assets.GRL.Scripts.Models;
+using cryptokartz.Scripts.GameControllers;
 using Fusion;
 using Fusion.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
+
 //using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -129,7 +132,8 @@ namespace Assets.GRL.Scripts.Managers
 
             System.Random random = new System.Random();
 
-            string newSessionName = config.SessionName + random.Next(0, 1000001).ToString();
+            //string newSessionName = config.SessionName + random.Next(0, 1000001).ToString();
+            string newSessionName = config.SessionName;
             string targetLobby = config.LobbyName;
             string trackId = config.TrackId;
 
@@ -151,6 +155,8 @@ namespace Assets.GRL.Scripts.Managers
             NetworkRunner newRaceRunner = Instantiate(_runnerServerPrefab);
             newRaceRunner.name = $"ServerRunner_{newSessionName}";
             newRaceRunner.ProvideInput = true;
+            newRaceRunner.GetComponent<GameManager>().SessionName = newSessionName;
+
             sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
 
             // Start the Fusion Session (Room) inside the specified Lobby

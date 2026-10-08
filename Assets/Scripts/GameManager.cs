@@ -31,7 +31,9 @@ namespace cryptokartz.Scripts.GameControllers
         private int TrackLevelId { get; set; }
 
         // Flask API URL (Update if not running locally on the same machine)
-        private readonly string API_BASE_URL = "http://localhost:8001/api";
+        private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
+        public string SessionName;
+
 
         #region Session Info Publishing
         public IEnumerator SessionInfoPublish(SessionInfo sessionInfo)
@@ -92,28 +94,32 @@ namespace cryptokartz.Scripts.GameControllers
 
         protected override void SubscribeTopics()
         {
-            // OMNIBUS UPGRADE: Scope the subscription strictly to THIS room's SessionName
-            if (Runner != null && Runner.SessionInfo != null)
-            {
-                string myRoomName = Runner.SessionInfo.Name;
-                string scopedTopic = $"game/manager/{myRoomName}/#";
+            //Debug.Log($"[GameManager] SubscribeTopics Runner != null: {Runner != null}");
+            //Debug.Log($"[GameManager] SubscribeTopics Runner.SessionInfo != null: {Runner.SessionInfo != null}");
 
-                client.Subscribe(new string[] { scopedTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-                Debug.Log($"[GameManager] Scoped MQTT Subscription to: {scopedTopic}");
-            }
-            else
-            {
-                Debug.LogWarning("[GameManager] Runner or SessionInfo is null. Cannot subscribe to scoped topics yet.");
-            }
+
+            // OMNIBUS UPGRADE: Scope the subscription strictly to THIS room's SessionName
+            //if (Object.Runner != null && Runner.SessionInfo != null)
+            //{
+            //SessionName = Runner.SessionInfo.Name.ToLower();
+            string scopedTopic = $"game/manager/{SessionName.ToLower()}/#";
+
+            client.Subscribe(new string[] { scopedTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
+            Debug.Log($"[GameManager] Scoped MQTT Subscription to: {scopedTopic}");
+            //}
+            //else
+            //{
+            //    Debug.LogWarning("[GameManager] Runner or SessionInfo is null. Cannot subscribe to scoped topics yet.");
+            //}
         }
 
         protected override void UnsubscribeTopics()
         {
-            if (Runner != null && Runner.SessionInfo != null)
-            {
-                string myRoomName = Runner.SessionInfo.Name;
-                client.Unsubscribe(new string[] { $"game/manager/{myRoomName}/#" });
-            }
+            //if (Runner != null && Runner.SessionInfo != null)
+            //{
+                //string myRoomName = Runner.SessionInfo.Name.ToLower();
+                client.Unsubscribe(new string[] { $"game/manager/{SessionName.ToLower()}/#" });
+            //}
         }
         #endregion
 
@@ -123,10 +129,10 @@ namespace cryptokartz.Scripts.GameControllers
             try
             {
                 string msg = System.Text.Encoding.UTF8.GetString(message);
-                string myRoomName = Runner.SessionInfo.Name;
+                string myRoomName = Runner.SessionInfo.Name.ToLower();
 
                 // Validate the message is actually for this room
-                if (!topic.Contains($"game/manager/{myRoomName}/")) return;
+                if (!topic.Contains($"game/manager/{myRoomName}")) return;
 
                 if (topic.Contains("livecar"))
                 {
@@ -346,7 +352,7 @@ namespace cryptokartz.Scripts.GameControllers
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-        public void OnConnectedToServer(NetworkRunner runner) { }
+        public void OnConnectedToServer(NetworkRunner runner) { SubscribeTopics(); }
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }

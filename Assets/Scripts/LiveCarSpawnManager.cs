@@ -10,10 +10,11 @@ using static Unity.Collections.Unicode;
 
 public class LiveCarSpawnManager : NetworkBehaviour
 {
-    int _levelId;
-    int _colorId;
-    string _vid;
+    public int _levelId;
+    public int _colorId;
+    public string _vid;
     GameObject _trackPlatform;
+    GameObject _masterTelemetrySubsciber;
 
 
     public override void Spawned()
@@ -27,15 +28,17 @@ public class LiveCarSpawnManager : NetworkBehaviour
             _levelId = Object.GetComponent<CarDataNetwork>().LevelId;
             _colorId = Object.GetComponent<CarDataNetwork>().ColorId;
             _vid = Object.GetComponent<CarDataNetwork>().Vid;
-            //string objFind = $"TrackPlatformPlacementTool/TrackPlatformPlacementTarget/TrackPlatformContainer/RaceTrackShell{_levelId}";
-            //string objFind = $"PlatformSurface/PlatformContainer/RaceTrackShell1";
-            string objFind = $"RaceTrackShell1";
-            //string objFind = $"RaceTrackShell{_levelId}";
-            //string objFind = $"RaceTrackShell1";
-            _trackPlatform = FindInRunnerScene(objFind);
+
+            //Find the Track in this Session and attach the car to it
+            string track = $"RaceTrackShell1";
+            _trackPlatform = FindInRunnerScene(track);
             transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
-            //_trackPlatform.GetComponent<TrackDefinitionManager>().TrackId = );
+
+            //find the MasterTelemetry Subscriber and register the car with it
+            string subscriber = $"MasterTelemetryProvider";
+            _masterTelemetrySubsciber = FindInRunnerScene(subscriber);
+            _masterTelemetrySubsciber.GetComponent<MasterTelemetrySubscriber>().AddCar(_vid, transform.gameObject);
         }
         else
         {
