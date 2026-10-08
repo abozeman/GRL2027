@@ -60,8 +60,7 @@ namespace cryptokartz.Scripts.GameControllers
         #endregion
 
         #region MQTT Client & Scoped Subscriptions
-
-        public void SetClientId(string clientId) { this.clientId = clientId; }
+                
         public void SetEncrypted(bool isEncrypted) { this.isEncrypted = isEncrypted; }
 
         protected override void OnConnecting()
@@ -94,32 +93,15 @@ namespace cryptokartz.Scripts.GameControllers
 
         protected override void SubscribeTopics()
         {
-            //Debug.Log($"[GameManager] SubscribeTopics Runner != null: {Runner != null}");
-            //Debug.Log($"[GameManager] SubscribeTopics Runner.SessionInfo != null: {Runner.SessionInfo != null}");
-
-
-            // OMNIBUS UPGRADE: Scope the subscription strictly to THIS room's SessionName
-            //if (Object.Runner != null && Runner.SessionInfo != null)
-            //{
-            //SessionName = Runner.SessionInfo.Name.ToLower();
             string scopedTopic = $"game/manager/{SessionName.ToLower()}/#";
 
             client.Subscribe(new string[] { scopedTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
             Debug.Log($"[GameManager] Scoped MQTT Subscription to: {scopedTopic}");
-            //}
-            //else
-            //{
-            //    Debug.LogWarning("[GameManager] Runner or SessionInfo is null. Cannot subscribe to scoped topics yet.");
-            //}
         }
 
         protected override void UnsubscribeTopics()
         {
-            //if (Runner != null && Runner.SessionInfo != null)
-            //{
-                //string myRoomName = Runner.SessionInfo.Name.ToLower();
-                client.Unsubscribe(new string[] { $"game/manager/{SessionName.ToLower()}/#" });
-            //}
+            client.Unsubscribe(new string[] { $"game/manager/{SessionName.ToLower()}/#" });
         }
         #endregion
 

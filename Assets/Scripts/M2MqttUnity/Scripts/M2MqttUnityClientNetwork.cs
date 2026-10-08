@@ -292,7 +292,9 @@ namespace M2MqttUnity
             yield return new WaitForEndOfFrame();
 
             client.Settings.TimeoutOnConnection = timeoutOnConnection;
-            //string clientId = Guid.NewGuid().ToString();
+            int randomInt = UnityEngine.Random.Range(1, 10000);
+            string clientId = randomInt.ToString() + "_" + System.Guid.NewGuid().ToString();
+
             try
             {
                 client.Connect(clientId, mqttUserName, mqttPassword);

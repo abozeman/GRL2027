@@ -183,10 +183,7 @@ namespace Assets.GRL.Scripts.Managers
         {
 
             var vid = topic.Split('/')[4];
-            Debug.Log("vid msgRaw: " + vid);
-
-            string msgDebug = System.Text.Encoding.UTF8.GetString(message);
-            //Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgDebug);
+            //Debug.Log("vid msgRaw: " + vid);
 
             if (!cars.ContainsKey(vid)) return;
 
@@ -237,7 +234,7 @@ namespace Assets.GRL.Scripts.Managers
 
         private void ProcessMessage(string msg)
         {
-            Debug.Log("MasterTelemetrySubscriber Received: " + msg);
+            //Debug.Log("MasterTelemetrySubscriber Received: " + msg);
         }
 
         /// <summary>
