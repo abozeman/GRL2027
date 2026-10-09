@@ -124,15 +124,6 @@ namespace cryptokartz.Scripts.GameControllers
 
                     NetworkObject car = grlLiveCarSpawn(_liveCarPrefab);
                     TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
-
-                    try
-                    {
-                        car.gameObject.transform.SetParent(tdm.gameObject.transform, true);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"[GameManager] LiveCar SetParent Failed: {e.StackTrace}");
-                    }
                 }
                 else if (topic.Contains("ghostcar"))
                 {
@@ -142,15 +133,6 @@ namespace cryptokartz.Scripts.GameControllers
 
                     NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
                     TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
-
-                    try
-                    {
-                        car.gameObject.transform.SetParent(tdm.gameObject.transform, true);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"[GameManager] GhostCar SetParent Failed: {e.StackTrace}");
-                    }
                 }
                 else if (topic.Contains("updatetrack"))
                 {
