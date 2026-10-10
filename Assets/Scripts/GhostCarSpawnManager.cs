@@ -13,23 +13,28 @@ public class GhostCarSpawnManager : NetworkBehaviour
     int _colorId;
     string _vid;
     GameObject _trackPlatform;
+    GameObject _masterTelemetrySubsciber;
+
 
     public override void Spawned()
     {
-        _vid = Object.GetComponent<CarDataNetwork>().Vid;
 
-        if (!Object.Runner.IsServer)
+        if (Object.Runner.IsServer)
         {
-
             _levelId = Object.GetComponent<CarDataNetwork>().LevelId;
             _colorId = Object.GetComponent<CarDataNetwork>().ColorId;
-            _levelId = 1;
-            //string objFind = $"TrackPlatformPlacementTool/TrackPlatformPlacementTarget/TrackPlatformContainer/RaceTrackShell{_levelId}";
-            string objFind = $"RaceTrackShell{_levelId}";
-            //_trackPlatform = GameObject.Find(objFind);
+            _vid = Object.GetComponent<CarDataNetwork>().Vid;
+
+            //Find the Track in this Session and attach the car to it
+            string objFind = $"RaceTrackShell1";
             _trackPlatform = FindInRunnerScene(objFind);
             transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
+
+            //find the MasterTelemetry Subscriber and register the car with it
+            string subscriber = $"MasterTelemetryProvider";
+            _masterTelemetrySubsciber = FindInRunnerScene(subscriber);
+            _masterTelemetrySubsciber.GetComponent<MasterTelemetrySubscriber>().AddCar(_vid, transform.gameObject);
         }
     }
 

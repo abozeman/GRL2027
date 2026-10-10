@@ -29,6 +29,7 @@ namespace cryptokartz.Scripts.GameControllers
         private int _playerCount;
         private PlayerRef _player;
         private int TrackLevelId { get; set; }
+        private string Vid { get; set; }
 
         // Flask API URL (Update if not running locally on the same machine)
         private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
@@ -119,20 +120,22 @@ namespace cryptokartz.Scripts.GameControllers
                 if (topic.Contains("livecar"))
                 {
                     Debug.Log($"[GameManager - {myRoomName}] livecar msg: {msg}");
-                    CreateCarConfig carConfig = new CreateCarConfig(msg);
-                    TrackLevelId = int.Parse(carConfig.RacePlatformLevel);
+                    SpawnCarConfig carConfig = new SpawnCarConfig(msg);
+                    TrackLevelId = int.Parse(carConfig.raceplatformlevel);
+                    Vid = carConfig.vid;
 
                     NetworkObject car = grlLiveCarSpawn(_liveCarPrefab);
-                    TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
+                    //TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
                 }
                 else if (topic.Contains("ghostcar"))
                 {
                     Debug.Log($"[GameManager - {myRoomName}] ghostcar msg: {msg}");
-                    CreateCarConfig carConfig = new CreateCarConfig(msg);
-                    TrackLevelId = int.Parse(carConfig.RacePlatformLevel);
+                    SpawnCarConfig carConfig = new SpawnCarConfig(msg);
+                    TrackLevelId = int.Parse(carConfig.raceplatformlevel);
+                    Vid = carConfig.vid;
 
                     NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
-                    TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
+                    //TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
                 }
                 else if (topic.Contains("updatetrack"))
                 {
@@ -293,7 +296,9 @@ namespace cryptokartz.Scripts.GameControllers
             {
                 objCarDataNetwork.LevelId = TrackLevelId;
                 objCarDataNetwork.ColorId = 1;
+                objCarDataNetwork.Vid = Vid;
             }
+
         }
 
         private Vector3 GetRacePlatformLevelVector(int level)

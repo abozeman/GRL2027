@@ -15,7 +15,7 @@ namespace cryptokartz.Scripts.Car
         
         [Networked] public int LevelId { get; set; }
         [Networked] public int ColorId { get; set; }
-        [Networked, Capacity(14)]
+        [Networked, Capacity(60)]
         public string Vid { get; set; }
 
         public ChangeDetector changeDetector { get; private set; }

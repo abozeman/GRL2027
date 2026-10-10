@@ -4,23 +4,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CreateCarConfig
+public class SpawnCarConfig
 {
-        public string RacePlatformLevel { get; set; }
-        //public string trackId { get; set; }
+        public string raceplatformlevel { get; set; }
+        public string trackId { get; set; }
+        public string vid { get; set; }
 
-    public CreateCarConfig() { }
+    public SpawnCarConfig() { }
 
-    public CreateCarConfig(string jsonString)
+    public SpawnCarConfig(string jsonString)
     {
         try
         {
 
-            var obj = JsonConvert.DeserializeObject<CreateCarConfig>(jsonString);
-            this.RacePlatformLevel = obj.RacePlatformLevel;
-            //this.trackId = obj.trackId;
+            var obj = JsonConvert.DeserializeObject<SpawnCarConfig>(jsonString);
+            this.raceplatformlevel = obj.raceplatformlevel;
+            this.trackId = obj.trackId;
+            this.vid = obj.vid;
 
-            Debug.Log($"CreateCarConfig obj {obj.ToString()}");
+            Debug.Log($"SpawnCarConfig obj {obj.ToString()}");
 
 
             //"{\r\n  \"sessionName\": \"OpenXR\",\r\n  \"customLobby\": \"GRLMROrlandoDev\",\r\n  \"port\": 27045,\r\n  \"raceType\": 300,\r\n  \"RacePlatformLevel\": \"1\",\r\n  \"trackId\": \"ovaltrack\"\r\n}"
@@ -30,9 +32,9 @@ public class CreateCarConfig
         }
         catch (Exception e)
         {
-            Debug.Log($"CreateCarConfig Failure Message {e.Message}");
-            Debug.Log($"CreateCarConfig Failure Source {e.Source}");
-            Debug.Log($"CreateCarConfig Failure Stack {e.StackTrace}");
+            Debug.Log($"SpawnCarConfig Failure Message {e.Message}");
+            Debug.Log($"SpawnCarConfig Failure Source {e.Source}");
+            Debug.Log($"SpawnCarConfig Failure Stack {e.StackTrace}");
         }
 
     }
