@@ -136,6 +136,7 @@ namespace Assets.GRL.Scripts.Managers
             string newSessionName = config.SessionName;
             string targetLobby = config.LobbyName;
             string trackId = config.TrackId;
+            string trackLevelId = config.RacePlatformLevel;
 
 
             // FIX: Ensure valid strings before starting
@@ -159,13 +160,21 @@ namespace Assets.GRL.Scripts.Managers
 
             sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
 
+            // 1. Create the SessionProperties dictionary
+            var sessionProperties = new Dictionary<string, SessionProperty>
+            {
+                { "trackId", trackId },
+                { "racePlatformLevel", trackLevelId }
+            };
+
             // Start the Fusion Session (Room) inside the specified Lobby
             var result = await StartSession(
                 newRaceRunner,
                 GameMode.Server,
                 newSessionName,
                 targetLobby,
-                sRef
+                sRef,
+                sessionProperties
             );
 
             // Validate and Register
@@ -175,8 +184,7 @@ namespace Assets.GRL.Scripts.Managers
 
                 _activeRaces.Add(newSessionName, newRaceRunner);
 
-                //int trackLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
-                string trackLevelId = config.RacePlatformLevel;
+                int parsedLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
                 StartCoroutine(RegisterRaceInDatabaseCoroutine(newSessionName, targetLobby, trackLevelId, trackId));
 
                 // Optionally, you can send a confirmation message back to the Master Agent or log it
@@ -186,7 +194,7 @@ namespace Assets.GRL.Scripts.Managers
             else
             {
                 Debug.LogError($"[Omnibus] Error starting room {newSessionName}: {result.ShutdownReason}");
-                //newRaceRunner.d();
+               await newRaceRunner.Shutdown();
             }
 
             return result;
@@ -206,7 +214,7 @@ namespace Assets.GRL.Scripts.Managers
             }
         }
 
-        public Task<StartGameResult> StartSession(NetworkRunner runner, GameMode gameMode, string sessionName, string lobbyName, SceneRef scene)
+        public Task<StartGameResult> StartSession(NetworkRunner runner, GameMode gameMode, string sessionName, string lobbyName, SceneRef scene, Dictionary<string, SessionProperty> customProps = null)
         {
             return runner.StartGame(new StartGameArgs()
             {
@@ -216,6 +224,7 @@ namespace Assets.GRL.Scripts.Managers
                 Address = Fusion.Sockets.NetAddress.Any(0),
                 SceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = scene,
+                SessionProperties = customProps // <--- Injects properties directly into the Fusion room
             });
         }
 

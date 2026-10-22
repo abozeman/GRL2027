@@ -1,62 +1,37 @@
 using Assets.GRL.Scripts.managers;
-using Assets.GRL.Scripts.Utils;
 using Fusion;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Application = UnityEngine.Application;
 
 namespace Assets.GRL.Scripts.Managers
 {
-
     public class ClientManager : ClientManagerBase
     {
-
-        Fusion.NetworkRunner runnerClient;
-        private SceneRef sRef;
-
-        protected async Task Start()
-        {
-            // Start the client
-            //_ = StartClient();
-        }
-
-
         public async Task<StartGameResult> StartClient(string lobbyName, string raceName)
         {
-            sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+            SceneRef sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
 
-            int loadGRLTask = await LoadGRLAsync(sRef);
+            // 1. Instantiate the Client Runner
+            NetworkRunner runnerClient = GetRunner("Client");
 
-            //Somehow we need to wait for the scene to load before starting the session, otherwise it will fail.
-            //also the raceName needs to be fetched from the DB or passed in as a parameter, from the UI Button
+            // 2. Start the game natively. Fusion handles the scene load and connection automatically.
+            var result = await runnerClient.StartGame(new StartGameArgs()
+            {
+                CustomLobbyName = lobbyName,
+                SessionName = raceName,
+                GameMode = GameMode.Client, // Strictly Client mode
+                SceneManager = runnerClient.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                Scene = sRef,
+            });
 
-            StartGameResult startGRLTask = await StartSessionAsync(raceName, lobbyName, sRef);
-            return startGRLTask;
-        }
-
-        public async Task<int> LoadGRLAsync(SceneRef sceneRef) // assume we return an int from this long running operation 
-        {
-            await SceneManager.LoadSceneAsync(sceneRef.AsIndex, LoadSceneMode.Single);
-            return 1;
-        }
-
-        public async Task<StartGameResult> StartSessionAsync(string raceName, string lobbyName, SceneRef scene) // assume we return an int from this long running operation 
-        {
-            runnerClient = GetRunner("Client");
-
-            var result = await StartSession(runnerClient, GameMode.Client, raceName, lobbyName, scene);
-
-            // Check if all went fine
             if (result.Ok)
             {
-
-                Log.Debug($"Runner Start session success");
-                //_instanceRunner.DestroySafely();
+                Debug.Log($"[ClientManager] Successfully joined session {raceName} as a Client.");
             }
             else
             {
-                Log.Debug($"Runner Start Session failed");
+                Debug.LogError($"[ClientManager] Failed to join session: {result.ShutdownReason}");
             }
 
             return result;
@@ -64,62 +39,25 @@ namespace Assets.GRL.Scripts.Managers
 
         private NetworkRunner GetRunner(string name)
         {
-
+            // Ensure _runnerClientPrefab does not have a NetworkObject attached to it in the inspector
             var runner = Instantiate(_runnerClientPrefab);
             runner.name = name;
             runner.ProvideInput = true;
-
             return runner;
-        }
-
-        /// <summary>
-        /// Start the simulation.
-        /// </summary>
-        /// <param name="runner">The runnerServer.</param>
-        /// <param name="gameMode">The game mode.</param>
-        /// <param name="sessionName">The session name.</param>
-        /// <returns><![CDATA[Task<StartGameResult>]]></returns>
-        public Task<StartGameResult> StartSession(
-            NetworkRunner runner,
-            GameMode gameMode,
-            string sessionName,
-            string lobbyName,
-            SceneRef scene
-          )
-        {
-
-            return runner.StartGame(new StartGameArgs()
-            {
-                CustomLobbyName = lobbyName,
-                SessionName = sessionName,
-                GameMode = gameMode,
-                SceneManager = runner.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Scene = scene,
-            });
-
-
-
         }
 
         public SceneRef GetSceneRefFromPath(string scenePath)
         {
-            // 1. Resolve the Unity build index from the specific asset path
             int buildIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
-
-            // 2. Ensure the scene actually exists in the Build Settings
             if (buildIndex >= 0)
             {
-                // 3. Convert the valid build index into a Fusion SceneRef
                 return SceneRef.FromIndex(buildIndex);
             }
             else
             {
-                UnityEngine.Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
+                Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
                 return default;
             }
         }
-
     }
-
-    
 }

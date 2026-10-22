@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using static Meta.XR.MRUtilityKit.MRUK;
 using static MetaAuthManager;
@@ -19,6 +20,8 @@ public class RoomSetupManager : MonoBehaviour
     public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
     public GameObject _targetButton { get; set; } // Assign this in the Unity Inspector
     public TextAsset WarehouseJSON;
+
+    private bool uiReady = false;
 
 
 
@@ -129,15 +132,17 @@ public class RoomSetupManager : MonoBehaviour
         if (!string.IsNullOrEmpty(response.Data))
         {
             await PopulateUIButtons(response.Data);
-            //GoToScene("GRLClient");
-
-            //_targetButton.GetComponent<GRLRaceButtonClickHandller>().Invoke("HandleClick", 0f);
-
+            if (_targetButton != null)
+            {
+                Debug.Log("[Desktop Mode] Instantly auto-clicking the race button.");
+                _targetButton.GetComponent<GRLRaceButtonClickHandller>().HandleClick();
+            }
         }
     }
 
     private async Task PopulateUIButtons(string responseData)
     {
+
         // Deserialize the JSON string directly into your RaceList model
         RaceList raceList = JsonConvert.DeserializeObject<RaceList>(responseData);
 
@@ -155,7 +160,7 @@ public class RoomSetupManager : MonoBehaviour
                 raceButton.GetComponent<GRLRaceButtonClickHandller>()._raceInfo = race;
                 raceButton.AddComponent<ClientManager>(); // Add the ClientManager component to the button
 
-                if (_targetButton == null)
+                if (_targetButton == null && race.status != "FINISHED")
                 {
                     _targetButton = raceButton; // Assign the first button as the target if not already set
                 }
@@ -189,16 +194,8 @@ public class RoomSetupManager : MonoBehaviour
 
             }
 
-            // TODO: Populate your scrollable UI panel with this list
-
         }
     }
 
-    public void GoToScene(string nextSceneName)
-    {
-        Debug.Log($"[Transition] Attempting to load scene: {nextSceneName}");
-
-        // Load the scene asynchronously in the background to prevent VR freezing
-        SceneManager.LoadSceneAsync(nextSceneName);
-    }
+    
 }

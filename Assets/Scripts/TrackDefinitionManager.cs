@@ -1,45 +1,40 @@
 using Assets.GRL.Scripts.Models;
 using Fusion;
-using Meta.XR.MRUtilityKit;
 using RestClient.Scripts.Clients;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
 {
     public RestClientTrackAPI RestClientTrackGenerator;
 
-    [Networked, Capacity(20)]
+    [Networked]
     public string TrackId { get; set; }
 
     [Networked]
     public int LevelId { get; set; }
 
+    // THE GOLDEN TICKET: Our simple state flag
+    [Networked]
+    public NetworkBool IsTrackLoaded { get; set; }
+
     public bool trackIsRendered { get; set; } = false;
     public TrackDefinition m_trackDefinition { get; set; }
 
-    [Networked]
-    [Capacity(60)]
+    [Networked, Capacity(60)]
     public NetworkArray<Vector2> ExteriorCoordinates { get; }
     [Networked] public int ExteriorCoordinatesLength { get; set; }
 
-    [Networked]
-    [Capacity(60)]
+    [Networked, Capacity(60)]
     public NetworkArray<Vector2> InteriorCoordinates { get; }
     [Networked] public int InteriorCoordinatesLength { get; set; }
 
-    [Networked]
-    [Capacity(4)]
+    [Networked, Capacity(4)]
     public NetworkArray<Vector2> StartlineCoordinates { get; }
     [Networked] public int StartlineCoordinatesLength { get; set; }
 
     public readonly List<ITrackDefinitionManager> m_trackDefinitionReadyListener = new();
-
     public float renderDelay { get; private set; } = .1f;
-
     private ChangeDetector _changes;
 
     public void RegisterTrackDefinitionReadyListener(ITrackDefinitionManager listener)
@@ -100,47 +95,42 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
                 StartlineCoordinates.Set(i, trackDefinition.StartLine[i]);
             }
         }
+
+        // SERVER ONLY: Once arrays are packed, declare the track fully loaded
+        if (Object.HasStateAuthority)
+        {
+            IsTrackLoaded = true;
+        }
     }
 
     public TrackDefinition GetTrackDefinition()
     {
-        return GetTrackDefinition(ExteriorCoordinates, InteriorCoordinates, StartlineCoordinates, ExteriorCoordinatesLength, InteriorCoordinatesLength, StartlineCoordinatesLength);
-    }
-
-    public TrackDefinition GetTrackDefinition(
-        NetworkArray<Vector2> _exteriorCoordinates,
-        NetworkArray<Vector2> _interiorCoordinates,
-        NetworkArray<Vector2> _startlineCoordinates,
-        int _exteriorCoordinatesLength,
-        int _interiorCoordinatesLength,
-        int _startlineCoordinatesLength)
-    {
         TrackDefinition trackDefinition = new TrackDefinition();
 
-        if (_exteriorCoordinatesLength > 0)
+        if (ExteriorCoordinatesLength > 0)
         {
-            trackDefinition.OuterBoundary = new Vector2[_exteriorCoordinatesLength];
-            for (var i = 0; i < _exteriorCoordinatesLength; i++)
+            trackDefinition.OuterBoundary = new Vector2[ExteriorCoordinatesLength];
+            for (var i = 0; i < ExteriorCoordinatesLength; i++)
             {
-                trackDefinition.OuterBoundary[i] = _exteriorCoordinates[i];
+                trackDefinition.OuterBoundary[i] = ExteriorCoordinates[i];
             }
         }
 
-        if (_interiorCoordinatesLength > 0)
+        if (InteriorCoordinatesLength > 0)
         {
-            trackDefinition.InnerBoundary = new Vector2[_interiorCoordinatesLength];
-            for (var i = 0; i < _interiorCoordinatesLength; i++)
+            trackDefinition.InnerBoundary = new Vector2[InteriorCoordinatesLength];
+            for (var i = 0; i < InteriorCoordinatesLength; i++)
             {
-                trackDefinition.InnerBoundary[i] = _interiorCoordinates[i];
+                trackDefinition.InnerBoundary[i] = InteriorCoordinates[i];
             }
         }
 
-        if (_startlineCoordinatesLength > 0)
+        if (StartlineCoordinatesLength > 0)
         {
-            trackDefinition.StartLine = new Vector2[_startlineCoordinatesLength];
-            for (var i = 0; i < _startlineCoordinatesLength; i++)
+            trackDefinition.StartLine = new Vector2[StartlineCoordinatesLength];
+            for (var i = 0; i < StartlineCoordinatesLength; i++)
             {
-                trackDefinition.StartLine[i] = _startlineCoordinates[i];
+                trackDefinition.StartLine[i] = StartlineCoordinates[i];
             }
         }
 
@@ -151,10 +141,11 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
     {
         m_trackDefinition = trackDefinition;
         OnTrackDefinitionUpdate(m_trackDefinition);
+
         if (m_trackDefinition != null)
         {
             NotifyTrackDefinitionReadyListener(LevelId);
-            Debug.Log("Notified listener of track definition ready.");
+            Debug.Log("Server: API callback complete. Arrays populated and listeners notified.");
         }
     }
 
@@ -165,7 +156,6 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
         if (Runner.IsServer)
         {
             RestClientTrackGenerator.RegisterGetTrackDefinitionCompleteListener(this);
-
             try
             {
                 if (!string.IsNullOrEmpty(TrackId))
@@ -178,39 +168,61 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
                 Debug.Log(e.Message);
             }
         }
+        else
+        {
+            // LATE-JOINER CATCH: Bypass the change detector if the server already loaded it
+            if (IsTrackLoaded)
+            {
+                CheckAndNotifyClientTrackLoaded();
+            }
+        }
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (!Runner.IsServer) return;
+        if (_changes == null) return;
 
         foreach (string propertyName in _changes.DetectChanges(this))
         {
             switch (propertyName)
             {
+                // ACTIVE CLIENT CATCH: Trigger when the server flips the bool mid-session
+                case nameof(ExteriorCoordinatesLength):
+                case nameof(InteriorCoordinatesLength):
+                case nameof(StartlineCoordinatesLength):
                 case nameof(ExteriorCoordinates):
-                    m_trackDefinition = GetTrackDefinition(ExteriorCoordinates, InteriorCoordinates, StartlineCoordinates, ExteriorCoordinatesLength, InteriorCoordinatesLength, StartlineCoordinatesLength);
-                    if (m_trackDefinition != null)
+                case nameof(IsTrackLoaded):
+                    if (IsTrackLoaded && !Runner.IsServer)
                     {
-                        NotifyTrackDefinitionReadyListener(LevelId);
-                        Debug.Log("Notified listener of track definition ready.");
+                        CheckAndNotifyClientTrackLoaded();
                     }
                     break;
 
                 case nameof(TrackId):
-                    try
+                    if (Runner.IsServer)
                     {
-                        RestClientTrackGenerator.GetTrackDefinition(TrackId);
-                    }
-                    catch (System.Exception e)
-                    {
-                        Debug.Log(e.Message);
+                        try
+                        {
+                            RestClientTrackGenerator.GetTrackDefinition(TrackId);
+                        }
+                        catch (System.Exception e)
+                        {
+                            Debug.Log(e.Message);
+                        }
                     }
                     break;
             }
         }
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority, InvokeLocal = false)]
-    public void RPC_ReceivedTrackDefinition() { }
+    private void CheckAndNotifyClientTrackLoaded()
+    {
+        m_trackDefinition = GetTrackDefinition();
+
+        if (m_trackDefinition != null && m_trackDefinition.OuterBoundary != null && m_trackDefinition.OuterBoundary.Length > 0)
+        {
+            NotifyTrackDefinitionReadyListener(LevelId);
+            Debug.Log($"[Client] Track state verified loaded. Exterior points: {ExteriorCoordinatesLength}");
+        }
+    }
 }
