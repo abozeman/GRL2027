@@ -723,7 +723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6297125a567c1ae41b18172f93eaf0b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.CarInputManagerLive
-  _carControlPublisher: {fileID: 0}
+  _carControlPublisher: {fileID: 1746317061539311714}
 --- !u!114 &1746317061539311714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -736,14 +736,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3cd0c54570f4f047a7febe15ea0002c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.Managers.CarControlDataLivePublisher
-  isEncrypted: 0
-  certificateName: 
-  connectionDelay: 500
-  timeoutOnConnection: 30000
-  autoConnect: 1
-  mqttUserName: 
-  mqttPassword: 
-  clientId: 
   vid: echoliveracer1
 --- !u!114 &7336572456164633982
 MonoBehaviour:
