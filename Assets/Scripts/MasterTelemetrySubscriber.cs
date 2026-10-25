@@ -28,7 +28,7 @@ namespace Assets.GRL.Scripts.Managers
         public float Velocity;
         public string SessionName;
 
-        public Dictionary<string, GameObject> cars;
+        public Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
 
 
         public override void Spawned()
@@ -114,7 +114,7 @@ namespace Assets.GRL.Scripts.Managers
 
             // Safely check the topic length before splitting
             string[] topicSegments = topic.Split('/');
-            if (topicSegments.Length < 4) return;
+            if (topicSegments.Length < 5) return;
 
             var vid = topicSegments[4];
             if (!cars.ContainsKey(vid)) return;
