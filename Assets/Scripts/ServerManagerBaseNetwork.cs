@@ -10,7 +10,7 @@ using M2MqttUnity;
 namespace Assets.GRL.Scripts.managers
 {
 
-    public abstract class ServerManagerBaseNetwork : M2MqttUnityClientNetwork
+    public abstract class ServerManagerBaseNetwork : SimulationBehaviour
     {
 
         /// <summary>

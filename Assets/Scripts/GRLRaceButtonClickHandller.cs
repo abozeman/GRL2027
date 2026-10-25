@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class GRLRaceButtonClickHandller : MonoBehaviour
 {
     private Button button;
-    public Race _raceInfo {get; set;}
+    public Race _raceInfo { get; set; }
 
     void Awake()
     {
@@ -18,7 +18,6 @@ public class GRLRaceButtonClickHandller : MonoBehaviour
 
     public void HandleClick()
     {
-        // Put prefab logic here, or find a manager class in the scene
         Debug.Log("Button handled its own click event natively.");
         Debug.Log($"Race Info Lobby Name: {_raceInfo.lobby_name}");
         Debug.Log($"Race Info Room Name: {_raceInfo.room_name}");
@@ -26,19 +25,26 @@ public class GRLRaceButtonClickHandller : MonoBehaviour
         Debug.Log($"Race Info Track ID: {_raceInfo.track_id}");
 
         StartCoroutine(StartClientRoutine());
-
     }
 
     private IEnumerator StartClientRoutine()
     {
-        var clientManager = button.GetComponent<ClientManager>();
-        yield return clientManager.StartClient(_raceInfo.lobby_name, _raceInfo.room_name);
+        // FIX: Search the entire scene for the ClientManager instead of just looking on the button
+        var clientManager = FindAnyObjectByType<ClientManager>();
 
+        // Safety check to ensure it was actually found in the scene hierarchy
+        if (clientManager != null)
+        {
+            yield return clientManager.StartClient(_raceInfo.lobby_name, _raceInfo.room_name);
+        }
+        else
+        {
+            Debug.LogError("[RaceButton] CRITICAL: ClientManager could not be found anywhere in the scene!");
+        }
     }
 
     void OnDestroy()
     {
-        // Best practice: clean up listeners when destroyed to prevent memory leaks
         button.onClick.RemoveListener(HandleClick);
     }
 }

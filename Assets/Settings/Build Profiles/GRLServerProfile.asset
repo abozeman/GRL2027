@@ -21,6 +21,9 @@ MonoBehaviour:
   m_OverrideGlobalSceneList: 1
   m_Scenes:
   - m_enabled: 1
+    m_path: Assets/Scenes/GRLServerStartup.unity
+    m_guid: a2a4b038515acd24b8dbcdf319368d32
+  - m_enabled: 1
     m_path: Assets/Scenes/GRLServer.unity
     m_guid: 0daa00964f7316a45b0e28fed06878c8
   - m_enabled: 1

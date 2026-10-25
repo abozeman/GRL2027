@@ -65,18 +65,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efffccf440569844abcf93097b0c21c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.Managers.MasterTelemetrySubscriber
-  isEncrypted: 0
-  certificateName: 
-  connectionDelay: 500
-  timeoutOnConnection: 30000
-  autoConnect: 1
-  mqttUserName: abozeman8466
-  mqttPassword: autumn8466
-  clientId: master-telemetry-01
   masterPosition: {x: 0, y: 0, z: 0}
   masterRotation: {x: 0, y: 0, z: 0, w: 0}
   CurrentLap: 0
   IsOffTrack: 0
   IsOverlapping: 0
   Velocity: 0
-  testCar: {fileID: 8525085160519899942, guid: 709b003ea0eb03d4db08943cf9d33336, type: 3}
+  SessionName: 

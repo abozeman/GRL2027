@@ -13,7 +13,7 @@ using uPLibrary.Networking.M2Mqtt.Messages;
 
 namespace Assets.GRL.Scripts.Managers
 {
-    public class MasterTelemetrySubscriber : MqttNetworkBehaviour
+    public class MasterTelemetrySubscriber : NetworkBehaviour
     {
         private List<string> eventMessages = new List<string>();
 
@@ -31,109 +31,39 @@ namespace Assets.GRL.Scripts.Managers
         public Dictionary<string, GameObject> cars;
 
 
-        #region MQTT Client
-
-        #region Broker Settings
-        /// <summary>
-        /// Set ClientId.
-        /// </summary>
-        /// <param name="clientId">The clientId.</param>
-        public void SetClientId(string clientId)
-        {
-            int randomInt = UnityEngine.Random.Range(1, 10000);
-            this.clientId = clientId + randomInt;
-        }
-
-        /// <summary>
-        /// Set the encrypted.
-        /// </summary>
-        /// <param name="isEncrypted">If true, is encrypted.</param>
-        public void SetEncrypted(bool isEncrypted)
-        {
-            this.isEncrypted = isEncrypted;
-        }
-        #endregion
-
-        #region Connection Methods
-        protected override void OnConnecting()
-        {
-            base.OnConnecting();
-            Debug.Log("MasterTelemetrySubscriber Connecting to broker on " + brokerAddress + ":" + brokerPort.ToString() + "...\n");
-        }
-
-        protected override void OnConnected()
-        {
-            base.OnConnected();
-            Debug.Log("MasterTelemetrySubscriber Connected to broker on " + brokerAddress + "\n");
-            SubscribeTopics();
-        }
-
-        protected override void OnConnectionFailed(string errorMessage)
-        {
-            Debug.Log("MasterTelemetrySubscriber CONNECTION FAILED! " + errorMessage);
-        }
-
-        protected override void OnDisconnected()
-        {
-            Debug.Log("MasterTelemetrySubscriber Disconnected.");
-        }
-
-        protected override void OnConnectionLost()
-        {
-            Debug.Log("MasterTelemetrySubscriber CONNECTION LOST!");
-            UnsubscribeTopics();
-        }
-        #endregion
-
-        #region Subscription/Unsubscription
-        protected override void SubscribeTopics()
-        {
-            
-
-            client.Subscribe(new string[] { string.Format("car/telemetry/json/{0}/{1}", SessionName, "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            //client.Subscribe(new string[] { string.Format("car/lapupdate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-            //client.Subscribe(new string[] { string.Format("car/vracestate/{0}", "#") }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE });
-
-        }
-
-        protected override void UnsubscribeTopics()
-        {
-            //client.Unsubscribe(new string[] { string.Format("car/telemetry/vr/{0}", "#") });
-            //client.Unsubscribe(new string[] { string.Format("car/lapupdate/{0}", "#") });
-            //client.Unsubscribe(new string[] { string.Format("car/vracestate/{0}", "#") });
-        }
-
-
-        #endregion
-
-        #endregion
-
         public override void Spawned()
         {
-
-
             if (Runner.IsServer)
             {
                 cars = new Dictionary<string, GameObject>();
-                SetClientId("MasterTelemetrySubscriber");
                 SessionName = Runner.SessionInfo.Name.ToLower();
-                base.Connect();
+                if (M2MqttUnityClientNetwork.Instance != null)
+                {
+                    M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic($"car/telemetry/json/{SessionName}/#");
+                }
                 Debug.Log("MasterTelemetrySubscriber Spawned & Started Connecting to broker...");
             }
             else
             {
                 Debug.Log("MasterTelemetrySubscriber Disbaled Itself...");
-                //this.gameObject.SetActive(false);
+                gameObject.SetActive(false);
             }
 
+        }
 
-           
-
-
+        public override void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (Runner.IsServer && M2MqttUnityClientNetwork.Instance != null)
+            {
+                M2MqttUnityClientNetwork.Instance.OnMessageReceived -= DecodeMessage;
+                M2MqttUnityClientNetwork.Instance.UnsubscribeFromTopic($"car/telemetry/json/{SessionName}/#");
+            }
         }
 
         public void AddCar(string vid, GameObject car)
         {
+            Debug.Log($"MasterTelemetrySubscriber Adding New VID {vid}");
             cars.Add(vid, car);
         }
 
@@ -179,18 +109,21 @@ namespace Assets.GRL.Scripts.Managers
 
         }
 
-        protected override void DecodeMessage(string topic, byte[] message)
+        protected void DecodeMessage(string topic, byte[] message)
         {
 
-            var vid = topic.Split('/')[4];
-            //Debug.Log("vid msgRaw: " + vid);
+            // Safely check the topic length before splitting
+            string[] topicSegments = topic.Split('/');
+            if (topicSegments.Length < 4) return;
 
+            var vid = topicSegments[4];
             if (!cars.ContainsKey(vid)) return;
+
+            string msgRaw = System.Text.Encoding.UTF8.GetString(message);
 
 
             try
             {
-                string msgRaw = System.Text.Encoding.UTF8.GetString(message);
                 //Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgRaw);
 
                 if (topic.Contains("telemetry"))
@@ -255,15 +188,5 @@ namespace Assets.GRL.Scripts.Managers
 
         }
 
-        private void OnDestroy()
-        {
-            Disconnect();
-        }
-
-        private void OnValidate()
-        {
-
-        }
-       
     }
 }

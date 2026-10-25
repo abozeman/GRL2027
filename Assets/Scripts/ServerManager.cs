@@ -3,6 +3,7 @@ using Assets.GRL.Scripts.Models;
 using cryptokartz.Scripts.GameControllers;
 using Fusion;
 using Fusion.Sockets;
+using M2MqttUnity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,65 +31,21 @@ namespace Assets.GRL.Scripts.Managers
         private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
         private SceneRef sRef;
 
-
-        #region MQTT Client
-
-        public void SetClientId(string clientId)
+        public void Awake()
         {
-            this.clientId = clientId;
+                if (M2MqttUnityClientNetwork.Instance != null)
+                {
+                    M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic($"server/manager/#");
+                }
         }
 
-        public void SetEncrypted(bool isEncrypted)
-        {
-            this.isEncrypted = isEncrypted;
-        }
-
-        protected override void OnConnecting()
-        {
-            base.OnConnecting();
-            Debug.Log("Connecting to broker on " + brokerAddress + ":" + brokerPort.ToString() + "...\n");
-        }
-
-        protected override void OnConnected()
-        {
-            base.OnConnected();
-            SubscribeTopics();
-            Debug.Log("Connected to broker on " + brokerAddress + "\n");
-        }
-
-        protected override void OnConnectionFailed(string errorMessage)
-        {
-            Debug.Log("CONNECTION FAILED! " + errorMessage);
-        }
-
-        protected override void OnDisconnected()
-        {
-            Debug.Log("Disconnected.");
-        }
-
-        protected override void OnConnectionLost()
-        {
-            Debug.Log("Server Manager CONNECTION LOST!");
-        }
-
-        protected override void SubscribeTopics()
-        {
-            client.Subscribe(new string[] { "server/manager/#" }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-        }
-
-        protected override void UnsubscribeTopics()
-        {
-            client.Unsubscribe(new string[] { "server/manager/#" });
-        }
-
-        #endregion
-
-        protected override async void DecodeMessage(string topic, byte[] message)
+        protected async void DecodeMessage(string topic, byte[] message)
         {
             try
             {
                 string msg = System.Text.Encoding.UTF8.GetString(message);
-                Debug.Log($"[ServerManager] Master Agent Command Received on Topic: {topic} | Msg: {msg}");
+                //Debug.Log($"[ServerManager] Master Agent Command Received on Topic: {topic} | Msg: {msg}");
 
                 if (topic.Contains("server/manager/create_race"))
                 {

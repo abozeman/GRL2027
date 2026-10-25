@@ -11,7 +11,7 @@ using System.Runtime.ConstrainedExecution;
 namespace Assets.GRL.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
-    public class CarControlDataLivePublisher : M2MqttUnityClientNetwork
+    public class CarControlDataLivePublisher : SimulationBehaviour
     {
         private List<string> eventMessages = new List<string>();
        
@@ -21,7 +21,24 @@ namespace Assets.GRL.Scripts.Managers
 
         [SerializeField] public string vid;
 
+        public void Spawned()
+        {
+            if (Runner.IsServer)
+            {
 
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        public void Despawned(NetworkRunner runner, bool hasState)
+        {
+            if (Runner.IsServer && M2MqttUnityClientNetwork.Instance != null)
+            {
+            }
+        }
 
         public void setControl(float steering, float throttle)
         {
@@ -47,7 +64,7 @@ namespace Assets.GRL.Scripts.Managers
 
             try
             {
-                client.Publish(string.Format("car.cc.{0}", vid), System.Text.Encoding.UTF8.GetBytes("{\"steering\": \"" + steeringToSend + "\",\"throttle\": \"" + throttleToSend + "\"}"));
+                M2MqttUnityClientNetwork.Instance.client.Publish(string.Format("car.cc.{0}", vid), System.Text.Encoding.UTF8.GetBytes("{\"steering\": \"" + steeringToSend + "\",\"throttle\": \"" + throttleToSend + "\"}"));
             }
             catch (Exception e)
             {
@@ -58,98 +75,10 @@ namespace Assets.GRL.Scripts.Managers
 
             yield return null;
 
-
         }
 
 
-        #region MQTT Client
-
-        #region Broker Settings
-        /// <summary>
-        /// Set ClientId.
-        /// </summary>
-        /// <param name="clientId">The clientId.</param>
-        public void SetClientId(string clientId)
-        {
-            this.clientId = clientId;
-        }
-        /// <summary>
-        /// Set broker address.
-        /// </summary>
-        /// <param name="brokerAddress">The broker address.</param>
-        //public void SetBrokerAddress(string brokerAddress)
-        //{
-        //    this.brokerAddress = brokerAddress;
-        //}
-
-        /// <summary>
-        /// Set broker port.
-        /// </summary>
-        /// <param name="brokerPort">The broker port.</param>
-        //public void SetBrokerPort(string brokerPort)
-        //{
-        //    int.TryParse(brokerPort, out this.brokerPort);
-        //}
-
-        /// <summary>
-        /// Set the encrypted.
-        /// </summary>
-        /// <param name="isEncrypted">If true, is encrypted.</param>
-        public void SetEncrypted(bool isEncrypted)
-        {
-            this.isEncrypted = isEncrypted;
-        }
-        #endregion
-
-        #region Connection Methods
-        protected override void OnConnecting()
-        {
-            base.OnConnecting();
-            Debug.Log("Connecting to broker on " + brokerAddress + ":" + brokerPort.ToString() + "...\n");
-        }
-
-        protected override void OnConnected()
-        {
-            base.OnConnected();
-            Debug.Log("Connected to broker on " + brokerAddress + "\n");
-            SubscribeTopics();
-        }
-
-        protected override void OnConnectionFailed(string errorMessage)
-        {
-            Debug.Log("CONNECTION FAILED! " + errorMessage);
-        }
-
-        protected override void OnDisconnected()
-        {
-            Debug.Log("Disconnected.");
-        }
-
-        protected override void OnConnectionLost()
-        {
-            Debug.Log("CarControlDataLivePublisher CONNECTION LOST!");
-            UnsubscribeTopics();
-        }
-        #endregion
-
-        #region Subscription/Unsubscription
-        protected override void SubscribeTopics()
-        {
-        }
-
-        protected override void UnsubscribeTopics()
-        {
-        }
-
-        #endregion
-
-        #endregion
-        
-        public void Spawned()
-        {
-        }
-      
-        protected override void DecodeMessage(string topic, byte[] message)
+        protected void DecodeMessage(string topic, byte[] message)
         {
             try
             {
@@ -178,8 +107,6 @@ namespace Assets.GRL.Scripts.Managers
         /// </summary>
         public override void FixedUpdateNetwork()
         {
-            base.Update(); // call ProcessMqttEvents()
-
             if (eventMessages.Count > 0)
                 {
                     foreach (string msg in eventMessages)
@@ -190,15 +117,6 @@ namespace Assets.GRL.Scripts.Managers
                 }
 
         }
-
-        private void OnDestroy()
-        {
-            Disconnect();
-        }
-
-        private void OnValidate()
-        {
-
-        }
+        
     }
 }

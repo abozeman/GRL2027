@@ -16,14 +16,19 @@ using cryptokartz.Scripts.Car;
 namespace cryptokartz.Scripts.GameControllers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
-    public class GameManager : M2MqttUnityClientNetwork, INetworkRunnerCallbacks
+    public class GameManager : SimulationBehaviour, INetworkRunnerCallbacks, ISpawned, IDespawned
     {
         [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private NetworkObject _liveCarPrefab;
         [SerializeField] private NetworkObject _ghostCarPrefab;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerMap = new Dictionary<PlayerRef, NetworkObject>();
-        private List<string> eventMessages = new List<string>();
+        private struct QueuedMessage
+        {
+            public string Topic;
+            public string Payload;
+        }
+        private List<QueuedMessage> eventMessages = new List<QueuedMessage>();
 
         private int _playerId;
         private int _playerCount;
@@ -35,118 +40,45 @@ namespace cryptokartz.Scripts.GameControllers
         private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
         public string SessionName;
 
-
-        #region Session Info Publishing
-        public IEnumerator SessionInfoPublish(SessionInfo sessionInfo)
+        public void Spawned()
         {
-            var jsonSessionInfo = JsonConvert.SerializeObject(sessionInfo);
-            client.Publish($"ckgame.sessioninfo.{sessionInfo.Name}", System.Text.Encoding.UTF8.GetBytes(jsonSessionInfo));
-            yield return new WaitForSecondsRealtime(.033f);
-        }
+            SessionName = Runner.SessionInfo.Name.ToLower();
+            Debug.Log($"[GameManager] has Spawned in room: {SessionName}");
 
-        public IEnumerator SessionInfoRemove(SessionInfo sessionInfo)
-        {
-            var jsonSessionInfo = JsonConvert.SerializeObject(sessionInfo);
-            client.Publish($"ckgame.sessioninfo.remove.{sessionInfo.Name}", System.Text.Encoding.UTF8.GetBytes(jsonSessionInfo));
-            yield return new WaitForSecondsRealtime(.033f);
-        }
-
-        void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
-        {
-            if (runner.IsServer)
+            if (M2MqttUnityClientNetwork.Instance != null && Runner != null)
             {
-                Log.Info($"sessionList updated: {sessionList.Count} sessions");
+                // Subscribe to the global event
+                M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+
+                string scopedTopic = $"game/manager/{SessionName}/#";
+                M2MqttUnityClientNetwork.Instance.SubscribeToTopic(scopedTopic);
+                Debug.Log($"[GameManager] Hooked into Singleton and subscribed to {scopedTopic}");
             }
         }
-        #endregion
 
-        #region MQTT Client & Scoped Subscriptions
-                
-        public void SetEncrypted(bool isEncrypted) { this.isEncrypted = isEncrypted; }
-
-        protected override void OnConnecting()
+        public void Despawned(NetworkRunner runner, bool hasState)
         {
-            base.OnConnecting();
-            Debug.Log($"[GameManager] Connecting to broker on {brokerAddress}:{brokerPort}...");
+            if (Runner.IsServer && M2MqttUnityClientNetwork.Instance != null)
+            {
+                string scopedTopic = $"game/manager/{SessionName}/#";
+                M2MqttUnityClientNetwork.Instance.OnMessageReceived -= DecodeMessage;
+                M2MqttUnityClientNetwork.Instance.UnsubscribeFromTopic(scopedTopic);
+            }
         }
-
-        protected override void OnConnected()
-        {
-            base.OnConnected();
-            Debug.Log($"[GameManager] Connected to broker on {brokerAddress}");
-            SubscribeTopics();
-        }
-
-        protected override void OnConnectionFailed(string errorMessage)
-        {
-            Debug.Log($"[GameManager] CONNECTION FAILED! {errorMessage}");
-        }
-
-        protected override void OnDisconnected()
-        {
-            Debug.Log("[GameManager] Disconnected.");
-        }
-
-        protected override void OnConnectionLost()
-        {
-            Debug.Log("[GameManager] CONNECTION LOST!");
-        }
-
-        protected override void SubscribeTopics()
-        {
-            string scopedTopic = $"game/manager/{SessionName.ToLower()}/#";
-
-            client.Subscribe(new string[] { scopedTopic }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-            Debug.Log($"[GameManager] Scoped MQTT Subscription to: {scopedTopic}");
-        }
-
-        protected override void UnsubscribeTopics()
-        {
-            client.Unsubscribe(new string[] { $"game/manager/{SessionName.ToLower()}/#" });
-        }
-        #endregion
 
         #region Message Decoding
-        protected override void DecodeMessage(string topic, byte[] message)
+
+        protected void DecodeMessage(string topic, byte[] message)
         {
             try
             {
                 string msg = System.Text.Encoding.UTF8.GetString(message);
                 string myRoomName = Runner.SessionInfo.Name.ToLower();
 
-                // Validate the message is actually for this room
                 if (!topic.Contains($"game/manager/{myRoomName}")) return;
 
-                if (topic.Contains("livecar"))
-                {
-                    Debug.Log($"[GameManager - {myRoomName}] livecar msg: {msg}");
-                    SpawnCarConfig carConfig = new SpawnCarConfig(msg);
-                    TrackLevelId = int.Parse(carConfig.raceplatformlevel);
-                    Vid = carConfig.vid;
-
-                    NetworkObject car = grlLiveCarSpawn(_liveCarPrefab);
-                    //TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
-                }
-                else if (topic.Contains("ghostcar"))
-                {
-                    Debug.Log($"[GameManager - {myRoomName}] ghostcar msg: {msg}");
-                    SpawnCarConfig carConfig = new SpawnCarConfig(msg);
-                    TrackLevelId = int.Parse(carConfig.raceplatformlevel);
-                    Vid = carConfig.vid;
-
-                    NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
-                    //TrackDefinitionManager tdm = GetTrackDefinitionManager(TrackLevelId);
-                }
-                else if (topic.Contains("updatetrack"))
-                {
-                    Debug.Log($"[GameManager - {myRoomName}] RaceTrackUpdated msg: {msg}");
-                    UpdateRaceTrackConfig raceTrackConfig = new UpdateRaceTrackConfig(msg);
-                    int rtLevel = int.Parse(raceTrackConfig.RacePlatformLevel);
-
-                    GetTrackDefinitionManager(rtLevel).TrackId = raceTrackConfig.trackId;
-                }
-
-                StoreMessage(msg);
+                // FIX 2: Do NOT spawn here! Just queue it for FixedUpdateNetwork
+                eventMessages.Add(new QueuedMessage { Topic = topic, Payload = msg });
             }
             catch (Exception e)
             {
@@ -154,23 +86,61 @@ namespace cryptokartz.Scripts.GameControllers
             }
         }
 
-        private void StoreMessage(string eventMsg) { eventMessages.Add(eventMsg); }
-        private void ProcessMessage(string msg) { /* Process generic messages here if needed */ }
-        #endregion
 
         public override void FixedUpdateNetwork()
         {
-            base.Update(); // call ProcessMqttEvents()
-
             if (eventMessages.Count > 0)
             {
-                foreach (string msg in eventMessages)
+                foreach (var msg in eventMessages)
                 {
-                    ProcessMessage(msg);
+                    ProcessMessage(msg.Topic, msg.Payload);
                 }
                 eventMessages.Clear();
             }
         }
+
+        private void ProcessMessage(string topic, string msg)
+        {
+            try
+            {
+                string myRoomName = Runner.SessionInfo.Name.ToLower();
+
+                if (topic.Contains("livecar") || topic.Contains("ghostcar"))
+                {
+                    // FIX 2: Safely parse the JSON using Newtonsoft (JObject) 
+                    // to completely ignore case-sensitivity mismatches in the Python payloads
+                    var jsonData = Newtonsoft.Json.Linq.JObject.Parse(msg);
+
+                    string rawLevel = (string)jsonData.GetValue("raceplatformlevel", StringComparison.OrdinalIgnoreCase)
+                                   ?? (string)jsonData.GetValue("RacePlatformLevel", StringComparison.OrdinalIgnoreCase)
+                                   ?? "4";
+
+                    TrackLevelId = int.Parse(rawLevel);
+                    Vid = (string)jsonData.GetValue("vid", StringComparison.OrdinalIgnoreCase);
+
+                    if (topic.Contains("livecar"))
+                    {
+                        NetworkObject car = grlLiveCarSpawn(_liveCarPrefab);
+                    }
+                    else if (topic.Contains("ghostcar"))
+                    {
+                        NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
+                    }
+                }
+                else if (topic.Contains("updatetrack"))
+                {
+                    UpdateRaceTrackConfig raceTrackConfig = new UpdateRaceTrackConfig(msg);
+                    int rtLevel = int.Parse(raceTrackConfig.RacePlatformLevel);
+                    GetTrackDefinitionManager(rtLevel).TrackId = raceTrackConfig.trackId;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[GameManager] ProcessMessage EXCEPTION: {e.Message}");
+            }
+        }
+
+        #endregion
 
         #region Player & Database Logic
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -321,7 +291,7 @@ namespace cryptokartz.Scripts.GameControllers
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { }
-        public void OnConnectedToServer(NetworkRunner runner) { SubscribeTopics(); }
+        public void OnConnectedToServer(NetworkRunner runner) { }
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) { }
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
         public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
@@ -411,6 +381,11 @@ namespace cryptokartz.Scripts.GameControllers
         void INetworkRunnerCallbacks.OnSceneLoadStart(NetworkRunner runner)
         {
 
+        }
+
+        void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+            throw new NotImplementedException();
         }
         #endregion
     }
