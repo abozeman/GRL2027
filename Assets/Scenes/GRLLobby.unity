@@ -450,7 +450,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   raceUIButtonContainer: {fileID: 2134480856}
   raceButtonPrefab: {fileID: 688320000250573698, guid: 9fb3652628afd924aa3cd12cb9d5269e, type: 3}
-  WarehouseJSON: {fileID: 4900000, guid: 5c5e77c0c4870e64eb274065a967b919, type: 3}
+  TestRoomJSON: {fileID: 4900000, guid: 5c5e77c0c4870e64eb274065a967b919, type: 3}
+  roomTest: 1
 --- !u!4 &889659517
 Transform:
   m_ObjectHideFlags: 0
@@ -1049,7 +1050,7 @@ GameObject:
   - component: {fileID: 1673802836}
   - component: {fileID: 1673802835}
   m_Layer: 0
-  m_Name: '[BuildingBlock] Camera Rig'
+  m_Name: OVRCameraRig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -36,10 +36,10 @@ namespace Assets.CryptoKartz.Scripts
                 trackIsRendered = false;
 
                 // Instantiate containers immediately
-                m_TrackSurface = Instantiate(TrackSurface, transform);
-                m_TrackExterior = Instantiate(TrackExterior, transform);
-                m_TrackInterior = Instantiate(TrackInterior, transform);
-                m_TrackStartline = Instantiate(TrackStartline, transform);
+                m_TrackSurface = Instantiate(TrackSurface, transform, false);
+                m_TrackExterior = Instantiate(TrackExterior, m_TrackSurface.transform, false);
+                m_TrackInterior = Instantiate(TrackInterior, m_TrackSurface.transform, false);
+                m_TrackStartline = Instantiate(TrackStartline, m_TrackSurface.transform, false);
 
                 // LATE-JOINER CATCH: Use our new highly reliable NetworkBool!
                 if (_trackDefinitionManager.IsTrackLoaded)
@@ -126,6 +126,8 @@ namespace Assets.CryptoKartz.Scripts
                     m_startLineRenderer.SetPosition(i, new Vector3(point.x * scale.x, point.y * scale.y, 0f));
                 }
             }
+
+            
 
             trackIsRendered = true;
             Debug.Log("[GRLTrackVisualsManagerV2] Track successfully rendered on Client.");

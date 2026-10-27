@@ -155,6 +155,14 @@ public class TrackDefinitionManager : NetworkBehaviour, ITrackAPI
 
         if (Runner.IsServer)
         {
+            // 1. Extract the trackId from the Runner's Session Properties
+            if (Runner.SessionInfo.Properties.TryGetValue("trackId", out var trackIdProp))
+            {
+                // Assign it to the Networked property so it replicates to all clients
+                TrackId = trackIdProp;
+                Debug.Log($"[TrackDefinitionManager] Track ID retrieved from Runner Properties: {TrackId}");
+            }
+
             RestClientTrackGenerator.RegisterGetTrackDefinitionCompleteListener(this);
             try
             {

@@ -44,6 +44,12 @@ public class LiveCarSpawnManager : NetworkBehaviour
         {
             //GetComponent<CarInputManagerLive>().enabled = false;
             //GetComponent<CarControlDataLivePublisher>().enabled = true;
+
+            //Find the Track in this Session and attach the car to it
+            string objFind = $"RaceTrackShell1";
+            _trackPlatform = FindInRunnerScene(objFind);
+            transform.SetParent(_trackPlatform.transform);
+            transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
         }
     }
 
