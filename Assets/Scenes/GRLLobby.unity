@@ -450,8 +450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   raceUIButtonContainer: {fileID: 2134480856}
   raceButtonPrefab: {fileID: 688320000250573698, guid: 9fb3652628afd924aa3cd12cb9d5269e, type: 3}
-  TestRoomJSON: {fileID: 4900000, guid: 5c5e77c0c4870e64eb274065a967b919, type: 3}
-  roomTest: 1
+  WarehouseJSON: {fileID: 4900000, guid: 5d6d9d58454eed44c98659c6931abc3e, type: 3}
 --- !u!4 &889659517
 Transform:
   m_ObjectHideFlags: 0
@@ -1212,7 +1211,7 @@ Transform:
   m_GameObject: {fileID: 1673802834}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 2.4, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

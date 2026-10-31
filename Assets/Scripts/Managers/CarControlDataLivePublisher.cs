@@ -8,7 +8,7 @@ using Fusion;
 using Assets.GRL.Scripts.Utils;
 using System.Runtime.ConstrainedExecution;
 
-namespace Assets.GRL.Scripts.Managers
+namespace Assets.Scripts.Managers
 {
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class CarControlDataLivePublisher : SimulationBehaviour

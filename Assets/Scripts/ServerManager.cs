@@ -89,7 +89,6 @@ namespace Assets.GRL.Scripts.Managers
 
             System.Random random = new System.Random();
 
-            //string newSessionName = config.SessionName + random.Next(0, 1000001).ToString();
             string newSessionName = config.SessionName;
             string targetLobby = config.LobbyName;
             string trackId = config.TrackId;
