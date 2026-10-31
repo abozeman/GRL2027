@@ -85,7 +85,7 @@ namespace Assets.GRL.Scripts.Managers
             Application.targetFrameRate = 30;
 
             // Parse Master Agent Command
-            CreateRaceTrackConfig config = new CreateRaceTrackConfig(msg);
+            CreateRaceConfig config = new CreateRaceConfig(msg);
 
             System.Random random = new System.Random();
 
@@ -159,7 +159,7 @@ namespace Assets.GRL.Scripts.Managers
         public void CloseRaceRoom(string msg)
         {
             // Simple parsing to find which room to close
-            CreateRaceTrackConfig config = new CreateRaceTrackConfig(msg);
+            CreateRaceConfig config = new CreateRaceConfig(msg);
             string sessionToClose = config.SessionName;
 
             if (!string.IsNullOrEmpty(sessionToClose) && _activeRaces.TryGetValue(sessionToClose, out NetworkRunner runner))

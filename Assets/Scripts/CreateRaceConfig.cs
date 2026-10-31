@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Assets.GRL.Scripts.Models
 {
     [Serializable]
-    public class CreateRaceTrackConfig
+    public class CreateRaceConfig
     {
         public string SessionName;
         public string LobbyName;
@@ -13,7 +13,7 @@ namespace Assets.GRL.Scripts.Models
         public string TrackId;
 
         // Constructor that takes the raw MQTT JSON string and maps it to these variables
-        public CreateRaceTrackConfig(string jsonMsg)
+        public CreateRaceConfig(string jsonMsg)
         {
             try
             {
