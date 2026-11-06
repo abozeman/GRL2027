@@ -27,7 +27,7 @@ namespace M2MqttUnity
         public bool autoConnect = true;
         public string mqttUserName = null;
         public string mqttPassword = null;
-        public string clientId = null;
+        private string clientId = null;
 
         public MqttClient client;
         private List<MqttMsgPublishEventArgs> messageQueue1 = new List<MqttMsgPublishEventArgs>();
@@ -127,7 +127,14 @@ namespace M2MqttUnity
             }
 
             client.Settings.TimeoutOnConnection = timeoutOnConnection;
-            if (string.IsNullOrEmpty(clientId)) clientId = Guid.NewGuid().ToString();
+
+            // --- NEW LOGIC: Force a unique Client ID ---
+            string envType = System.Environment.GetEnvironmentVariable("SERVER_TYPE");
+            if (string.IsNullOrEmpty(envType)) envType = "unknown_server";
+
+            // Overwrite any Inspector values with a guaranteed unique string
+            clientId = $"GRL_{envType}_{Guid.NewGuid().ToString().Substring(0, 8)}";
+            // -------------------------------------------
 
             try
             {
@@ -135,7 +142,7 @@ namespace M2MqttUnity
                 if (client.IsConnected)
                 {
                     client.MqttMsgPublishReceived += OnMqttMessageReceived;
-                    Debug.Log($"[MQTT] Global Client Connected to {brokerAddress}");
+                    Debug.Log($"[MQTT] Global Client Connected to {brokerAddress} as {clientId}");
                     ConnectionSucceeded?.Invoke();
                 }
             }

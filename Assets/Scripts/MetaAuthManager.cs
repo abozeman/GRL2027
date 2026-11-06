@@ -21,6 +21,7 @@ public class MetaAuthManager : MonoBehaviour
 
     void Start()
     {
+
 #if UNITY_EDITOR
         // 1. EDITOR BYPASS: Skip Meta hardware check and instantly mock a DB login
         Debug.Log("[Auth] Running in Unity Editor. Bypassing Meta hardware entitlement.");
@@ -37,6 +38,7 @@ public class MetaAuthManager : MonoBehaviour
             HandleFailedEntitlement();
         }
 #endif
+
     }
 
     private void OnInitCallback(Message msg)

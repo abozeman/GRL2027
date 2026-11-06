@@ -28,6 +28,7 @@ namespace Assets.GRL.Scripts.Utils
             config.SessionName = agentConfig.sessionName;
             config.Lobby = agentConfig.customLobby;
             config.Port = 0;
+            config.Region = "us";
 
             config.SessionProperties.Add("type", agentConfig.raceType);
             config.SessionProperties.Add("RacePlatformLevel", agentConfig.level);

@@ -1,4 +1,6 @@
+using Assets.GRL.Scripts;
 using Assets.GRL.Scripts.Managers;
+using cryptokartz.Scripts.Car;
 using cryptokartz.Scripts.Player;
 using Fusion;
 using Fusion.Sockets;
@@ -7,11 +9,10 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;            // Added for payload encoding
 using UnityEngine;
 using UnityEngine.Networking; // Added for REST API
-using System.Text;            // Added for payload encoding
 using uPLibrary.Networking.M2Mqtt.Messages;
-using cryptokartz.Scripts.Car;
 
 namespace cryptokartz.Scripts.GameControllers
 {
@@ -21,6 +22,7 @@ namespace cryptokartz.Scripts.GameControllers
         [SerializeField] private NetworkObject _playerPrefab;
         [SerializeField] private NetworkObject _liveCarPrefab;
         [SerializeField] private NetworkObject _ghostCarPrefab;
+        [SerializeField] private NetworkObject _simCarPrefab;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerMap = new Dictionary<PlayerRef, NetworkObject>();
         private struct QueuedMessage
@@ -30,9 +32,6 @@ namespace cryptokartz.Scripts.GameControllers
         }
         private List<QueuedMessage> eventMessages = new List<QueuedMessage>();
 
-        private int _playerId;
-        private int _playerCount;
-        private PlayerRef _player;
         private int TrackLevelId { get; set; }
         private string Vid { get; set; }
 
@@ -40,10 +39,21 @@ namespace cryptokartz.Scripts.GameControllers
         private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
         public string SessionName;
 
+        public string RaceType { get; set; } = "practice"; // Defaults to practice for safety
+
         public void Spawned()
         {
             SessionName = Runner.SessionInfo.Name.ToLower();
             Debug.Log($"[GameManager] has Spawned in room: {SessionName}");
+
+            // Read the Race Type passed down from the Orchestrator/Database
+            if (Runner.SessionInfo.Properties.TryGetValue("raceType", out var typeProp))
+            {
+                RaceType = typeProp;
+            }
+
+            Debug.Log($"[GameManager] Spawned in room: {SessionName} | Race Type: {RaceType}");
+
 
             if (M2MqttUnityClientNetwork.Instance != null && Runner != null)
             {
@@ -145,70 +155,116 @@ namespace cryptokartz.Scripts.GameControllers
         #region Player & Database Logic
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            Debug.Log($"[GameManager] Entered OnPlayerJoined for PlayerRef: {player.PlayerId}");
+            if (!runner.IsServer) return;
 
-            if (runner.IsServer && _playerPrefab != null)
+            // 1. Unpack the Connection Token to identify the client platform
+            byte[] tokenBytes = runner.GetPlayerConnectionToken(player);
+            string clientPlatform = tokenBytes != null ? System.Text.Encoding.UTF8.GetString(tokenBytes) : "UNKNOWN";
+
+            Debug.Log($"[GameManager] PlayerRef {player.PlayerId} joined as {clientPlatform}. Race Type is {RaceType}");
+
+            // 2. The Gatekeeper Logic
+            if (RaceType == "practice" && (clientPlatform == "WEBXR" || clientPlatform == "QUEST"))
             {
-                _playerId = player.PlayerId;
-                _playerCount = Runner.SessionInfo.PlayerCount - 1;
-                _player = player;
-
-                if (_playerCount == 0) return;
-
-                // 1. Spawn the Avatar
+                // PURE SIMULATION: Spawn a simulated car and grant browser input authority
+                NetworkObject simCar = grlSimulatedCarSpawn(_simCarPrefab, player);
+                _playerMap[player] = simCar;
+                runner.SetPlayerObject(player, simCar);
+                Debug.Log("[GameManager] Granted WebXR user a simulated car for practice.");
+            }
+            else if (RaceType == "live" && clientPlatform == "WEBXR")
+            {
+                // REAL RACE SPECTATOR: Do NOT spawn a car. Do NOT grant input authority.
+                // They exist in the room purely to receive the network transforms and watch.
+                Debug.Log("[GameManager] WebXR Spectator connected to Live race. No vehicle spawned.");
+            }
+            else if (RaceType == "live" && clientPlatform == "QUEST")
+            {
+                // PHYSICAL COMPETITOR: Spawn the floating VR Avatar 
                 NetworkObject character = grlAvatarSpawn(_playerPrefab, player);
                 _playerMap[player] = character;
                 runner.SetPlayerObject(player, character);
-
-                Log.Info($"[GameManager] Spawned Avatar for Player: {player}");
-
-                // 2. OMNIBUS UPGRADE: Register the contestant in PostgreSQL
-                // TODO: You will need to extract the actual User ID and Wallet from your auth system here.
-                // For now, we are generating mock/placeholder data to ensure the pipeline works.
-                string mockUserId = System.Guid.NewGuid().ToString();
-                string mockWallet = "0xMockWalletAddress123456789";
-                string emptyCarConfig = "{}";
-
-                StartCoroutine(RegisterContestantInDatabaseCoroutine(
-                    runner.SessionInfo.Name, // Use the Session Name as the Room ID
-                    mockUserId,
-                    mockWallet,
-                    emptyCarConfig
-                ));
+                Debug.Log("[GameManager] Quest user connected. Avatar spawned.");
             }
-        }
 
-        private IEnumerator RegisterContestantInDatabaseCoroutine(string roomName, string userId, string walletAddress, string carConfigJson)
-        {
-            string url = $"{API_BASE_URL}/contestants/join";
+            // 3. Database Registration (Run for everyone who connects)
 
-            // Build the payload mapping to your Flask API fields
-            string jsonPayload = $@"{{
-                ""race_id"": ""{roomName}"", 
-                ""user_id"": ""{userId}"", 
-                ""wallet_address"": ""{walletAddress}"", 
-                ""car_config"": {carConfigJson}
-            }}";
-
-            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            string raceId = "unknown"; // Default to unknown if not provided
+            // Read the Race Type passed down from the Orchestrator/Database
+            if (Runner.SessionInfo.Properties.TryGetValue("raceId", out var typeProp))
             {
-                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonPayload);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    Debug.LogError($"[Database] Failed to register contestant in room {roomName}: {request.error} | Response: {request.downloadHandler.text}");
-                }
-                else
-                {
-                    Debug.Log($"[Database] Successfully registered contestant in room {roomName}. Response: {request.downloadHandler.text}");
-                }
+                raceId = typeProp;
             }
+
+            string mockUserId = System.Guid.NewGuid().ToString();
+            string mockWallet = "0xMockWalletAddress123456789";
+            //StartCoroutine(WaitAndRegisterContestant(runner, mockUserId, mockWallet, "{}"));
         }
+
+        //private IEnumerator WaitAndRegisterContestant(NetworkRunner runner, string userId, string walletAddress, string carConfigJson)
+        //{
+        //    string raceId = string.Empty;
+
+        //    // Loop until the ServerManager successfully injects the valid UUID into the properties
+        //    while (string.IsNullOrEmpty(raceId) || raceId == "unknown")
+        //    {
+        //        if (runner.SessionInfo.Properties.TryGetValue("raceId", out var typeProp))
+        //        {
+        //            raceId = typeProp;
+        //        }
+
+        //        if (string.IsNullOrEmpty(raceId) || raceId == "unknown")
+        //        {
+        //            yield return new WaitForSeconds(0.5f); // Wait half a second and check again
+        //        }
+        //    }
+
+        //    Debug.Log($"[Database] raceId : {raceId}");
+
+
+        //    // Once we have a valid UUID, execute the actual API payload
+        //    StartCoroutine(RegisterContestantInDatabaseCoroutine(runner.SessionInfo.Name, userId, walletAddress, raceId, carConfigJson));
+        //}
+
+        //private IEnumerator RegisterContestantInDatabaseCoroutine(string roomName, string userId, string walletAddress, string raceId,string carConfigJson)
+        //{
+        //    //string url = $"http://192.168.2.49:8001/api/contestants/join";
+
+        //    // Build the payload mapping to your Flask API fields
+        //    //string jsonPayload = $@"{{
+        //    //    ""race_id"": ""{raceId}"", 
+        //    //    ""user_id"": ""{userId}"", 
+        //    //    ""wallet_address"": ""{walletAddress}"", 
+        //    //    ""car_config"": {carConfigJson}
+        //    //}}";
+
+
+        //    string url = $"http://192.168.2.49:8001/api/contestants/join";
+        //    Debug.Log($"[Database] url : {url}");
+
+        //    //string url = $"{API_BASE_URL}/races/create";
+        //    string jsonPayload = $"{{\"race_id\":\"{raceId}\", \"user_id\":\"{userId}\", \"wallet_address\":\"{walletAddress}\", \"car_config\":\"{carConfigJson}\"}}";
+        //    Debug.Log($"[Database] jsonPayload : {jsonPayload}");
+
+        //    using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        //    {
+        //        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonPayload);
+        //        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        //        request.downloadHandler = new DownloadHandlerBuffer();
+        //        request.SetRequestHeader("Content-Type", "application/json");
+
+        //        yield return request.SendWebRequest();
+
+        //        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        //        {
+        //            Debug.LogError($"[Database] Failed to register contestant in room {roomName}: {request.error} | Response: {request.downloadHandler.text}");
+        //        }
+        //        else
+        //        {
+        //            Debug.Log($"[Database] Successfully registered contestant in room {roomName}. Response: {request.downloadHandler.text}");
+        //        }
+        //    }
+        //}
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
@@ -259,6 +315,11 @@ namespace cryptokartz.Scripts.GameControllers
             return Runner.Spawn(_objPrefab, Vector3.zero, Quaternion.identity, inputAuthority: PlayerRef.None, InitializeCarBeforeSpawn);
         }
 
+        private NetworkObject grlSimulatedCarSpawn(NetworkObject _objPrefab, PlayerRef player)
+        {
+            return Runner.Spawn(_objPrefab, Vector3.zero, Quaternion.identity, inputAuthority: player, InitializeSimulatedCarBeforeSpawn);
+        }
+
         private void InitializeCarBeforeSpawn(NetworkRunner runner, NetworkObject obj)
         {
             var objCarDataNetwork = obj.GetComponent<CarDataNetwork>();
@@ -269,6 +330,19 @@ namespace cryptokartz.Scripts.GameControllers
                 objCarDataNetwork.Vid = Vid;
             }
 
+        }
+
+        private void InitializeSimulatedCarBeforeSpawn(NetworkRunner runner, NetworkObject obj)
+        {
+            // Inherit the track level and color logic you already wrote
+            InitializeCarBeforeSpawn(runner, obj);
+
+            // Flag the car to intercept MQTT and use local Unity physics
+            var inputManager = obj.GetComponent<CarInputManagerLive>();
+            if (inputManager != null)
+            {
+                inputManager.IsSimulated = true;
+            }
         }
 
         private Vector3 GetRacePlatformLevelVector(int level)

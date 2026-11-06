@@ -11,6 +11,7 @@ namespace Assets.GRL.Scripts.Models
         public string LobbyName;
         public string RacePlatformLevel;
         public string TrackId;
+        public string RaceType;
 
         // Constructor that takes the raw MQTT JSON string and maps it to these variables
         public CreateRaceConfig(string jsonMsg)

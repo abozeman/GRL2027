@@ -132,11 +132,27 @@ public class RoomSetupManager : MonoBehaviour
         if (!string.IsNullOrEmpty(response.Data))
         {
             await PopulateUIButtons(response.Data);
-            if (_targetButton != null)
-            {
-                Debug.Log("[Desktop Mode] Instantly auto-clicking the race button.");
-                _targetButton.GetComponent<GRLRaceButtonClickHandller>().HandleClick();
-            }
+        }
+    }
+
+    private System.Collections.IEnumerator WaitAndClickRoutine()
+    {
+        Debug.Log("[Desktop Mode] UI populated. Waiting 30 seconds before auto-clicking...");
+
+        // Pause execution for 30 seconds
+        yield return new WaitForSeconds(30f);
+
+        // Grab the first button that was dynamically generated in the UI container
+        GRLRaceButtonClickHandller[] availableButtons = raceUIButtonContainer.GetComponentsInChildren<GRLRaceButtonClickHandller>();
+
+        if (availableButtons != null && availableButtons.Length > 0)
+        {
+            Debug.Log("[Desktop Mode] 30 seconds reached! Artificially clicking the target race button.");
+            availableButtons[0].HandleClick();
+        }
+        else
+        {
+            Debug.LogWarning("[Desktop Mode] Cannot auto-click. No active race buttons were found in the container.");
         }
     }
 
@@ -195,6 +211,8 @@ public class RoomSetupManager : MonoBehaviour
             }
 
         }
+
+        StartCoroutine(WaitAndClickRoutine());
     }
 
     

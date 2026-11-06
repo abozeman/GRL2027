@@ -30,14 +30,25 @@ namespace Assets.GRL.Scripts.Managers
         // Your Flask API URL (Update this to your actual server IP/Domain when deployed)
         private readonly string API_BASE_URL = "http://192.168.2.49:8001/api";
         private SceneRef sRef;
+        private string _serverType;
 
         public void Awake()
         {
-                if (M2MqttUnityClientNetwork.Instance != null)
-                {
-                    M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
-                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic($"server/manager/#");
-                }
+            // 1. Read the tag from the Docker environment (default to practice for safety)
+            _serverType = System.Environment.GetEnvironmentVariable("SERVER_TYPE");
+            if (string.IsNullOrEmpty(_serverType)) _serverType = "practice";
+
+            Debug.Log($"[ServerManager] Booting as {_serverType.ToUpper()} server.");
+
+            if (M2MqttUnityClientNetwork.Instance != null)
+            {
+                M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+                // 2. Subscribe ONLY to this server's specific topic
+                string scopedTopic = $"server/manager/{_serverType}/#";
+                M2MqttUnityClientNetwork.Instance.SubscribeToTopic(scopedTopic);
+                Debug.Log($"[ServerManager] Subscribed to {scopedTopic}");
+            }
+            
         }
 
         protected async void DecodeMessage(string topic, byte[] message)
@@ -47,13 +58,13 @@ namespace Assets.GRL.Scripts.Managers
                 string msg = System.Text.Encoding.UTF8.GetString(message);
                 //Debug.Log($"[ServerManager] Master Agent Command Received on Topic: {topic} | Msg: {msg}");
 
-                if (topic.Contains("server/manager/create_race"))
+                if (topic.Contains($"server/manager/{_serverType}/create_race"))
                 {
                     var result = await CreateNewRaceRoom(msg);
                     Debug.Log("StartServer Result: " + result);
 
                 }
-                else if (topic.Contains("server/manager/close_race"))
+                else if (topic.Contains($"server/manager/{_serverType}/close_race"))
                 {
                     CloseRaceRoom(msg);
                 }
@@ -93,6 +104,8 @@ namespace Assets.GRL.Scripts.Managers
             string targetLobby = config.LobbyName;
             string trackId = config.TrackId;
             string trackLevelId = config.RacePlatformLevel;
+            string raceType = config.RaceType;
+            string raceId = string.Empty;
 
 
             // FIX: Ensure valid strings before starting
@@ -120,7 +133,9 @@ namespace Assets.GRL.Scripts.Managers
             var sessionProperties = new Dictionary<string, SessionProperty>
             {
                 { "trackId", trackId },
-                { "racePlatformLevel", trackLevelId }
+                { "racePlatformLevel", trackLevelId },
+                { "raceId", raceId },
+                { "raceType", raceType }
             };
 
             // Start the Fusion Session (Room) inside the specified Lobby
@@ -139,13 +154,7 @@ namespace Assets.GRL.Scripts.Managers
                 Debug.Log($"[Omnibus] Successfully started race room: {newSessionName} in lobby: {targetLobby}");
 
                 _activeRaces.Add(newSessionName, newRaceRunner);
-
-                int parsedLevelId = int.TryParse(config.RacePlatformLevel, out int parsedLevel) ? parsedLevel : 4;
-                StartCoroutine(RegisterRaceInDatabaseCoroutine(newSessionName, targetLobby, trackLevelId, trackId));
-
-                // Optionally, you can send a confirmation message back to the Master Agent or log it
-
-
+                StartCoroutine(RegisterRaceInDatabaseCoroutine(newRaceRunner, newSessionName, targetLobby, trackLevelId, trackId, raceType));
             }
             else
             {
@@ -186,12 +195,14 @@ namespace Assets.GRL.Scripts.Managers
 
         #region Database API Calls
 
-        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(string roomName, string lobbyName, string trackLevelId, string trackId)
+        // Pass the runner into the Coroutine so it can update the session properties
+        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(NetworkRunner runner, string roomName, string lobbyName, string trackLevelId, string trackId, string raceType)
         {
-            string url = $"{API_BASE_URL}/races/create";
+            string url = $"http://192.168.2.49:8001/api/races/create";
             Debug.Log($"[Database] url : {url}");
 
-            string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":{trackLevelId}, \"track_id\":\"{trackId}\"}}";
+            //string url = $"{API_BASE_URL}/races/create";
+            string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":\"{trackLevelId}\", \"track_id\":\"{trackId}\", \"race_type\":\"{raceType}\"}}";
             Debug.Log($"[Database] jsonPayload : {jsonPayload}");
 
 
@@ -204,13 +215,28 @@ namespace Assets.GRL.Scripts.Managers
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError($"[Database] Failed to register race {roomName}: {request.error}");
+                    // 1. Parse the JSON response from your Flask API to get the new GUID
+                    // Adjust the ["race_id"] key if your Python API returns a different key name
+                    var responseJson = Newtonsoft.Json.Linq.JObject.Parse(request.downloadHandler.text);
+                    string generatedRaceId = responseJson["race_id"]?.ToString();
+
+                    // 2. Inject the UUID directly into the live Fusion Session Properties
+                    if (!string.IsNullOrEmpty(generatedRaceId) && runner != null && runner.SessionInfo != null)
+                    {
+                        var updatedProps = new Dictionary<string, SessionProperty>
+                {
+                    { "raceId", generatedRaceId } // This key is now available to all clients
+                };
+
+                        runner.SessionInfo.UpdateCustomProperties(updatedProps);
+                        Debug.Log($"[ServerManager] Live Session Properties updated with Race ID: {generatedRaceId}");
+                    }
                 }
                 else
                 {
-                    Debug.Log($"[Database] Successfully registered race {roomName}. Response: {request.downloadHandler.text}");
+                    Debug.LogError($"[ServerManager] Failed to create race in DB: {request.error}");
                 }
             }
         }

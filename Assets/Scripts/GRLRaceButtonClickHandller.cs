@@ -18,11 +18,13 @@ public class GRLRaceButtonClickHandller : MonoBehaviour
 
     public void HandleClick()
     {
+        // 1. DEBOUNCE: If already clicked, ignore. Otherwise, disable instantly.
+        if (!button.interactable) return;
+        button.interactable = false;
+
         Debug.Log("Button handled its own click event natively.");
         Debug.Log($"Race Info Lobby Name: {_raceInfo.lobby_name}");
         Debug.Log($"Race Info Room Name: {_raceInfo.room_name}");
-        Debug.Log($"Race Info Status: {_raceInfo.status}");
-        Debug.Log($"Race Info Track ID: {_raceInfo.track_id}");
 
         StartCoroutine(StartClientRoutine());
     }

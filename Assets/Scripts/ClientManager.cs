@@ -15,6 +15,16 @@ namespace Assets.GRL.Scripts.Managers
             // 1. Instantiate the Client Runner
             NetworkRunner runnerClient = GetRunner("Client");
 
+            // 1. Identify the platform automatically at compile time
+            string clientPlatform = "QUEST";
+            #if UNITY_WEBGL
+                    clientPlatform = "WEBXR";
+            #endif
+
+            // 2. Convert to a byte array for Fusion's ConnectionToken
+            byte[] tokenBytes = System.Text.Encoding.UTF8.GetBytes(clientPlatform);
+
+
             // 2. Start the game natively. Fusion handles the scene load and connection automatically.
             var result = await runnerClient.StartGame(new StartGameArgs()
             {
@@ -23,6 +33,7 @@ namespace Assets.GRL.Scripts.Managers
                 GameMode = GameMode.Client, // Strictly Client mode
                 SceneManager = runnerClient.gameObject.AddComponent<NetworkSceneManagerDefault>(),
                 Scene = sRef,
+                ConnectionToken = tokenBytes // Inject the token here
             });
 
             if (result.Ok)

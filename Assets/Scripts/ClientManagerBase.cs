@@ -1,11 +1,12 @@
-using UnityEngine;
+using Assets.GRL.Scripts.Utils;
+using Fusion;
+using Fusion.Photon.Realtime;
+using Fusion.Sockets;
+using M2MqttUnity;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Fusion.Sockets;
-using Fusion;
-using Assets.GRL.Scripts.Utils;
-using M2MqttUnity;
+using UnityEngine;
 
 namespace Assets.GRL.Scripts.managers
 {
@@ -61,6 +62,12 @@ namespace Assets.GRL.Scripts.managers
                 }
             }
 
+            // 1. Get a fresh copy of the global Photon settings in RAM
+            FusionAppSettings customAppSettings = PhotonAppSettings.Global.AppSettings.GetCopy();
+
+            // 2. Force the specific region code (e.g., "us", "eu", "asia")
+            customAppSettings.FixedRegion = "us";
+
             // Start Runner
             return runner.StartGame(new StartGameArgs()
             {
@@ -73,6 +80,7 @@ namespace Assets.GRL.Scripts.managers
                 CustomPublicAddress = externalAddr,
                 CustomLobbyName = customLobby,
                 IsOpen = true,
+                CustomPhotonAppSettings = customAppSettings
             });
         }
 
