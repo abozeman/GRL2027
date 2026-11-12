@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 155c404b76b216c44ac0ce136a79e68e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421058
+  packageName: Free Dissolve Shader Pack - URP
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/SliceDissolve_URP.mat
+  uploadId: 1028536

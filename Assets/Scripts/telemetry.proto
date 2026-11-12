@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+
+package grl; 
+
+message Telemetry {
+    int32 type = 1;
+    string vid = 2;
+    float posX = 3;
+    float posZ = 4;
+    float velX = 5;
+    float velZ = 6;
+    float rotW = 7;
+    float rotX = 8;
+    float rotY = 9;
+    float rotZ = 10;
+    double timestamp = 11;
+}

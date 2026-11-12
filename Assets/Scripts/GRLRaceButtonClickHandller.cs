@@ -31,6 +31,11 @@ public class GRLRaceButtonClickHandller : MonoBehaviour
 
     private IEnumerator StartClientRoutine()
     {
+        if (LocalXRPersistence.Instance != null)
+        {
+            LocalXRPersistence.Instance.CorralRoomBeforeTransition();
+        }
+
         // FIX: Search the entire scene for the ClientManager instead of just looking on the button
         var clientManager = FindAnyObjectByType<ClientManager>();
 

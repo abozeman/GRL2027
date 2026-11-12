@@ -1,0 +1,474 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8652081454087501053
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SliceDissolve_URP
+  m_Shader: {fileID: 4800000, guid: 1ffb00c88dcb60f489b3b5323e5daffe, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _INVERTDIRECTION_ON
+  - _WIPE_AXIS_X_AXIS
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 2c112216efd267645b9dc58c71ff924c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: ae6137e9cfe6c554fbf23726fe3f7013, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DissolveMap:
+        m_Texture: {fileID: 2800000, guid: f15657c4945f8e1498b1883d64206931, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DissolveMask:
+        m_Texture: {fileID: 2800000, guid: 686b884582e9504479690928d3064273, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: dc940f995c1fad546be3b3a777c06a1d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskMap:
+        m_Texture: {fileID: 2800000, guid: 3834faa1335fb3941a824e384077d049, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 2800000, guid: 3834faa1335fb3941a824e384077d049, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 2800000, guid: 848d5e6af583fe54493302db35d50bff, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 466042edfa70f2d45af1bab5ab5cc75c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Alpha: 1
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _AmountPower: 1.41
+    - _AmountResponse: 0.85
+    - _AngleOffset: 0.734
+    - _ArcBandWidth: 0.1
+    - _ArcBranchStrength: 0.55
+    - _ArcBreakup: 0.434
+    - _ArcDensity: 0.28
+    - _ArcFrequency: 9.9
+    - _ArcFrontierWidth: 0.16
+    - _ArcGlowWidth: 0.087
+    - _ArcIntensity: 1.93
+    - _ArcJaggedness: 0.563
+    - _ArcScale: 12
+    - _ArcSpeed: 5
+    - _ArcThickness: 0.0058
+    - _ArcWidth: 0.0284
+    - _AshDarken: 0.65
+    - _AshDensity: 0.55
+    - _AshScale: 24
+    - _AshSizeVariation: 0.7
+    - _AshTimingVariation: 0.8
+    - _AspectCompensation: 1.61
+    - _AxisCenterOffset: 0
+    - _AxisDensity: 2
+    - _AxisHalfSize: 1.2
+    - _AxisMax: 1
+    - _AxisMin: -1
+    - _AxisMode: 2
+    - _AxisOffset: 0
+    - _BandCount: 12.5
+    - _BandIntensity: 1.55
+    - _BandRandomness: 0.484
+    - _BandStripeCount: 5.14
+    - _BandStripeSharpness: 7.61
+    - _BandWidth: 0.034
+    - _BaseFade: 0
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 1
+    - _BlockCount: 13.5
+    - _BlockCountX: 19.6
+    - _BlockCountY: 20
+    - _BlockDropout: 0.624
+    - _BodyDissolveEnd: 0.79
+    - _BodyDissolveStart: 0.234
+    - _BodyFadeStart: 0.29
+    - _BodyGone: 0.499
+    - _BodyNoiseScale: 3.5
+    - _BodyNoiseStrength: 0.035
+    - _BodySmoothness: 0.82
+    - _BreakupScale: 31.2
+    - _BreakupStrength: 0.288
+    - _BulgeStrength: 0.12
+    - _BumpScale: 1
+    - _BurstDistortion: 0.12
+    - _CellEdgeGlowWidth: 0.0521
+    - _CellJitter: 0.481
+    - _CellScale: 16.4
+    - _CellShrink: 0.75
+    - _CellTimingSpread: 0.497
+    - _CenterX: 0.5
+    - _CenterY: 0.5
+    - _CenterZ: 0
+    - _ClearCoatMask: 0
+    - _ClearCoatSmoothness: 0
+    - _CollapseCurve: 1.25
+    - _CollapseStart: 0.55
+    - _CollapseStrength: 0.85
+    - _CompressionStrength: 0.95
+    - _CoreFull: 0.335
+    - _CoreIntensity: 3.76
+    - _CoreScale: 8.1
+    - _CoreSharpness: 3.29
+    - _CoreStart: 0.162
+    - _CoreWidth: 0.018
+    - _CrackGrowth: 0.383
+    - _CrackIntensity: 3.83
+    - _CrackScale: 14.7
+    - _CrackStart: 0.224
+    - _CrackWidth: 0.0266
+    - _Cull: 2
+    - _CurlStrength: 0.35
+    - _Cutoff: 0.5
+    - _DarkenAmount: 0.15
+    - _DeformCurve: 1
+    - _DeformStart: 0.05
+    - _DepthScale: 1
+    - _DetailAlbedoMapScale: 1
+    - _DetailNormalMapScale: 1
+    - _DetailStrength: 0.2
+    - _DissolveAmount: 0.5
+    - _DissolveBias: 0.356
+    - _DissolveEdgeIntensity: 7.79
+    - _DissolveEdgeWidth: 0.0623
+    - _DissolveGlowWidth: 0.025
+    - _DissolveStart: 0.524
+    - _DistanceFalloff: 3.82
+    - _DistortionStrength: 0.12
+    - _DitherStrength: 0.35
+    - _DrainFull: 0.24
+    - _DrainMode: 0
+    - _DrainStart: 0.219
+    - _DrainStrength: 1
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _DustDensity: 0.34
+    - _DustIntensity: 2.2
+    - _DustScale: 104.4
+    - _DustSpread: 0.45
+    - _DustStart: 0.18
+    - _EdgeDissolveWidth: 0.213
+    - _EdgeIntensity: 7.5
+    - _EdgeWidth: 0.0741
+    - _EndPadding: 0.102
+    - _EnvironmentReflections: 1
+    - _Falloff: 1.5
+    - _FarSideMinPull: 0.452
+    - _FarSidePull: 0.28
+    - _FlickerStrength: 0.281
+    - _FreezeFull: 0.309
+    - _FreezeStart: 0.116
+    - _FresnelInfluence: 0.282
+    - _FresnelIntensity: 0.59
+    - _FresnelPower: 2
+    - _FresnelWidth: 0.142
+    - _FrostScale: 18.6
+    - _FrostStrength: 0.405
+    - _FullPullStart: 0.55
+    - _GhostBlend: 0.429
+    - _GhostFull: 0.42
+    - _GhostStart: 0.08
+    - _GlossMapScale: 0
+    - _Glossiness: 0
+    - _GlossyReflections: 0
+    - _HeightBlend: 0
+    - _HeightMax: 1
+    - _HeightMin: -1
+    - _HexScale: 14.9
+    - _HologramFull: 0.48
+    - _HologramStart: 0.149
+    - _IceBlend: 0.59
+    - _InfluenceDistance: 3.39
+    - _InnerIntensity: 4
+    - _InnerWidth: 0.113
+    - _Intensity: 3.43
+    - _Invert: 0
+    - _InvertDirection: 0.229
+    - _InvertMask: 0
+    - _LateFarSideBoost: 1.4
+    - _LiftStrength: 0.55
+    - _LineCount: 11.8
+    - _LineGlowStrength: 0.65
+    - _LineOffsetStrength: 0.064
+    - _LineRandomness: 0.65
+    - _LineSharpness: 3.54
+    - _LineStrength: 0.18
+    - _LineWidth: 0.12
+    - _MaskBias: 0.003
+    - _MaskContrast: 1.27
+    - _MaskInfluence: 0.603
+    - _MaskMax: 0.715
+    - _MaskMin: 0.137
+    - _MaskRangeMax: 0.985
+    - _MaskRangeMin: 0.015
+    - _MaxRadius: 2
+    - _Metallic: 0
+    - _MinimumDrainRange: 0.25
+    - _NearSideBoost: 2.86
+    - _NoiseContrast: 1.8
+    - _NoisePower: 1
+    - _NoiseScale: 9.3
+    - _NoiseStrength: 0.121
+    - _ObjectHeightMax: 1
+    - _ObjectHeightMin: -1
+    - _ObjectMax: 0.5
+    - _ObjectMaxX: 0.5
+    - _ObjectMin: -0.5
+    - _ObjectMinX: -0.5
+    - _OcclusionStrength: 1
+    - _OffsetRandomness: 0.73
+    - _OffsetStrength: 0.665
+    - _OuterIntensity: 6
+    - _OuterWidth: 0.02
+    - _OutlineAlpha: 0.85
+    - _OutlineEndThreshold: 0.816
+    - _OutlineFadeStart: 0.757
+    - _OutlineGlowFull: 0.26
+    - _OutlineGlowStart: 0.061
+    - _OutlineIntensity: 3.19
+    - _OutlinePower: 3.64
+    - _OutlineThinStart: 0.558
+    - _OutlineThreshold: 0.409
+    - _Parallax: 0.005
+    - _PetrifyFull: 0.35
+    - _PetrifyStart: 0.102
+    - _PlaneFalloff: 1.5
+    - _PlaneInfluence: 3
+    - _Projection: 2
+    - _PullStart: 0.18
+    - _PullStrength: 8
+    - _PulseCount: 6.96
+    - _PulseIntensity: 1.03
+    - _PulseOffset: 0
+    - _PulseSharpness: 2.56
+    - _PulseSpacing: 0.18
+    - _PulseWidth: 0.073
+    - _QueueOffset: 0
+    - _RadialCollapse: 0.25
+    - _RadialStrength: 0.35
+    - _RadiusMax: 0.983
+    - _RadiusMin: 0
+    - _RadiusScale: 0.44
+    - _RangeMax: 0.82
+    - _RangeMin: 0.18
+    - _ReceiveShadows: 1
+    - _RegionVariation: 0.45
+    - _RingIntensity: 6
+    - _RingWidth: 0.023
+    - _RuneBreakup: 0.35
+    - _RuneFull: 0.355
+    - _RuneInfluence: 0.75
+    - _RuneIntensity: 4.5
+    - _RuneLineWidth: 0.035
+    - _RuneOffset: 0
+    - _RuneScale: 19.7
+    - _RuneStart: 0.153
+    - _ScanIntensity: 0.69
+    - _ScanLineCount: 46.6
+    - _ScanLinePhase: 0.34
+    - _ScanLineSpeed: 0
+    - _ScanLineWidth: 0.247
+    - _ScanWidth: 0.06
+    - _ShapePower: 2
+    - _ShatterEdgeIntensity: 2.96
+    - _ShatterStart: 0.495
+    - _ShrinkCurve: 1.37
+    - _ShrinkStrength: 0.852
+    - _SliceCount: 11.6
+    - _SliceDensity: 3.5
+    - _SliceFadeWidth: 0.42
+    - _SliceGap: 0.16
+    - _SliceOffset: -0.38
+    - _SliceOffsetStrength: 0.257
+    - _Smoothness: 0.549
+    - _SmoothnessTextureChannel: 0
+    - _SoftNoiseScale: 18
+    - _SoftNoiseStrength: 0.15
+    - _SolidBreakStart: 0.22
+    - _SolidGone: 0.55
+    - _SparkDensity: 0.126
+    - _SparkIntensity: 5.23
+    - _SparkScale: 18.2
+    - _SparkStart: 0.102
+    - _SpecularHighlights: 1
+    - _SpiralDirection: 1
+    - _SpiralStrength: 0.238
+    - _SpiralTurns: 1.6
+    - _SpreadNoiseScale: 18
+    - _SpreadNoiseStrength: 0.55
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _StaggerStrength: 0.364
+    - _StartEndPadding: 0.08
+    - _StartPadding: 0.052
+    - _StoneBlend: 0.787
+    - _StoneNoiseScale: 15.3
+    - _StoneNoiseStrength: 0.428
+    - _StretchStrength: 7.04
+    - _StripeCount: 11.3
+    - _StripeGap: 0.08
+    - _StripeTimingOffset: 0.22
+    - _SuctionStrength: 3.12
+    - _Surface: 0
+    - _SurfaceDarken: 0.593
+    - _SwirlStrength: 1.16
+    - _SwirlTurns: 2.88
+    - _TileCountX: 23.6
+    - _TileCountY: 30.2
+    - _TileGap: 0.1
+    - _TimingSpread: 0.22
+    - _TimingVariation: 0.336
+    - _TransitionSoftness: 0.08
+    - _Transparency: 0.511
+    - _TriangleTimingVariation: 0.35
+    - _TriangleVariation: 0.75
+    - _TwistStrength: 1
+    - _TwistTurns: 1.5
+    - _VerticalBreakup: 0.12
+    - _WIPE_AXIS: 0
+    - _WaveAmplitude: 0.138
+    - _WaveFrequency: 10.08
+    - _WaveScale: 12
+    - _WaveSpeed: -0.48
+    - _WaveStrength: 0.18
+    - _WindStrength: 1.4
+    - _WireAppearStart: 0.08
+    - _WireFadeStart: 0.7
+    - _WireIntensity: 5
+    - _WireStart: 0.15
+    - _WireWidth: 0.025
+    - _WorkflowMode: 1
+    - _WorldHeightMax: 8
+    - _WorldHeightMin: 0
+    - _WorldXMax: 7
+    - _WorldXMin: -10
+    - _WorldZMax: 1
+    - _WorldZMin: -1
+    - _XAxisMax: 2
+    - _XAxisMin: -2
+    - _YAxisMax: 1
+    - _YAxisMin: -1
+    - _ZAxisMax: 1
+    - _ZAxisMin: -1
+    - _ZWrite: 1
+    m_Colors:
+    - _ArcColor: {r: 0.2, g: 2, b: 6, a: 1}
+    - _ArcCoreColor: {r: 2, g: 4, b: 8, a: 1}
+    - _ArcGlowColor: {r: 0.05, g: 1.2, b: 8, a: 1}
+    - _ArcOuterColor: {r: 0.05, g: 1.2, b: 6, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Center: {r: 0.5, g: 0.5, b: 0, a: 0}
+    - _CenterWS: {r: 0, g: 1, b: 0, a: 0}
+    - _CollapseAxisWS: {r: 0, g: 1, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _CoreColor: {r: 0.5999999, g: 0.12459014, b: 0, a: 1}
+    - _CrackColor: {r: 1, g: 0.20318882, b: 0, a: 1}
+    - _DissolveDirectionOS: {r: 1, g: 0, b: 0, a: 0}
+    - _DissolveDirectionWS: {r: 0, g: 1, b: 0, a: 0}
+    - _DissolveEdgeColor: {r: 0.04054648, g: 0.56765074, b: 1.1353015, a: 1}
+    - _DustColor: {r: 1.2, g: 0.65, b: 0.25, a: 1}
+    - _EdgeColor: {r: 0.47320816, g: 0.0039215684, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FresnelColor: {r: 0.034415904, g: 0.4301988, b: 0.8603976, a: 1}
+    - _GhostColor: {r: 0.074877866, g: 0.64894146, b: 1.3977201, a: 1}
+    - _HoloColor: {r: 0.12565434, g: 2.3481727, b: 6, a: 1}
+    - _HotColor: {r: 3.9999995, g: 0.9386751, b: 0.104712, a: 1}
+    - _IceColor: {r: 0.15253116, g: 0.39528865, b: 0.7283019, a: 1}
+    - _InnerBurnColor: {r: 1, g: 0.11638965, b: 0, a: 1}
+    - _OuterBurnColor: {r: 1, g: 0.7838856, b: 0.10196078, a: 1}
+    - _OutlineColor: {r: 0.29319385, g: 3.4605641, b: 6.9999995, a: 1}
+    - _PortalNormalWS: {r: -1, g: 0, b: 0, a: 0}
+    - _PortalOffsetWS: {r: 0, g: 2, b: 0, a: 0}
+    - _PulseColor: {r: 0.016301489, g: 0.4075372, b: 1.304119, a: 1}
+    - _RingColor: {r: 0, g: 1, b: 1, a: 1}
+    - _RuneColor: {r: 0.15, g: 2.5, b: 6, a: 1}
+    - _ScanColor: {r: 0, g: 0.98833746, b: 0.24708436, a: 1}
+    - _ShatterEdgeColor: {r: 1.4980392, g: 0.1554076, b: 0.10980387, a: 1}
+    - _SparkColor: {r: 1, g: 0.3774085, b: 0.12156862, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _StoneColor: {r: 0.41999996, g: 0.41999996, b: 0.41999996, a: 1}
+    - _SuctionOffsetWS: {r: -7, g: 0, b: 0, a: 0}
+    - _SuctionPoint: {r: 0, g: 0, b: 2, a: 0}
+    - _SuctionPointWS: {r: 0, g: 8, b: 0, a: 0}
+    - _TintColor: {r: 0, g: 0.85, b: 1, a: 1}
+    - _WindDirection: {r: 1, g: 0.15, b: 0, a: 0}
+    - _WindDirectionWS: {r: 0, g: 6, b: 0, a: 0}
+    - _WireColor: {r: 0.1, g: 3, b: 8, a: 1}
+  m_BuildTextureStacks: []

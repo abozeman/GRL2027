@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 997e66f71f422704ba01756cd3c069ce
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421058
+  packageName: Free Dissolve Shader Pack - URP
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Dissolve Shader Collection - URP/Scripts/EricDissolveBounds.cs
+  uploadId: 1028536

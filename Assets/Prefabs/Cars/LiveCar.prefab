@@ -623,6 +623,7 @@ GameObject:
   - component: {fileID: 1746317061539311714}
   - component: {fileID: 7336572456164633982}
   - component: {fileID: 6857537048276100602}
+  - component: {fileID: 8990014792150430592}
   m_Layer: 0
   m_Name: LiveCar
   m_TagString: Untagged
@@ -710,6 +711,7 @@ MonoBehaviour:
   - {fileID: 4180487851149503529}
   - {fileID: 7336572456164633982}
   - {fileID: 6857537048276100602}
+  - {fileID: 8990014792150430592}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4180487851149503529
 MonoBehaviour:
@@ -724,6 +726,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.CarInputManagerLive
   _carControlPublisher: {fileID: 1746317061539311714}
+  _IsSimulated:
+    RawValue: 0
+  MoveSpeed: 15
+  TurnSpeed: 60
 --- !u!114 &1746317061539311714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -767,3 +773,21 @@ MonoBehaviour:
   _LevelId: 1
   _ColorId: 2
   _Vid: grlracer1
+  _DriverName:
+    _length: 0
+    _data:
+      Data: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+--- !u!114 &8990014792150430592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525085160519899942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f2a53ade19a4484bb5b6a56eafc469a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.Player.PlayerInputProvider
+  ERLLeftStick: {fileID: 1584157723050965039, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}
+  ERLRightStick: {fileID: 9176000218046303869, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}

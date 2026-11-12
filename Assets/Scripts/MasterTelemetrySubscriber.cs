@@ -5,11 +5,10 @@ using Fusion.Sockets;
 using M2MqttUnity;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
 using UnityEngine;
-using uPLibrary.Networking.M2Mqtt.Messages;
+using Google.Protobuf; // Required for Protobuf parser
+using Grl; // Your generated Protobuf namespace
 
 namespace Assets.GRL.Scripts.Managers
 {
@@ -30,7 +29,6 @@ namespace Assets.GRL.Scripts.Managers
 
         public Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
 
-
         public override void Spawned()
         {
             if (Runner.IsServer)
@@ -40,16 +38,19 @@ namespace Assets.GRL.Scripts.Managers
                 if (M2MqttUnityClientNetwork.Instance != null)
                 {
                     M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
-                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic($"car/telemetry/json/{SessionName}/#");
+                    // Subscribing explicitly to the Protobuf 'vr' topic[cite: 3, 5]
+                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic($"car/telemetry/vr/{SessionName}/#");
+
+                    // Note: You must ensure 'vracestate' and 'lapupdate' are either published under this 
+                    // root or you explicitly subscribe to their specific topics here as well.
                 }
-                Debug.Log("MasterTelemetrySubscriber Spawned & Started Connecting to broker...");
+                Debug.Log("MasterTelemetrySubscriber Spawned & Subscribed to Protobuf stream...");
             }
             else
             {
-                Debug.Log("MasterTelemetrySubscriber Disbaled Itself...");
+                Debug.Log("MasterTelemetrySubscriber Disabled Itself...");
                 gameObject.SetActive(false);
             }
-
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -57,7 +58,7 @@ namespace Assets.GRL.Scripts.Managers
             if (Runner.IsServer && M2MqttUnityClientNetwork.Instance != null)
             {
                 M2MqttUnityClientNetwork.Instance.OnMessageReceived -= DecodeMessage;
-                M2MqttUnityClientNetwork.Instance.UnsubscribeFromTopic($"car/telemetry/json/{SessionName}/#");
+                M2MqttUnityClientNetwork.Instance.UnsubscribeFromTopic($"car/telemetry/vr/{SessionName}/#");
             }
         }
 
@@ -70,23 +71,19 @@ namespace Assets.GRL.Scripts.Managers
         private void handleLapUpdate(LapData lapData)
         {
             Debug.Log("lap: " + lapData.lap);
-            Debug.Log("laptimes: " + lapData.lapTimes);
-
             foreach (string lapTime in lapData.lapTimes)
             {
                 Debug.Log(lapTime);
             }
-
         }
-        private void handleTelemetryData(TelemetryData telemetryData)
+
+        private void handleTelemetryData(Telemetry pbData)
         {
+            var vid = pbData.Vid;
 
-            //var vid = "grlracer1";
-            var vid = telemetryData.vid;
-
-            //Get The Raw Measurement First
-            masterPosition = new Vector3(telemetryData.posX, telemetryData.posY, telemetryData.posZ);
-            masterRotation = new Quaternion(telemetryData.rotX, telemetryData.rotY, telemetryData.rotZ, telemetryData.rotW);
+            // Map directly to Unity's coordinate system from Protobuf properties (PascalCase)
+            masterPosition = new Vector3(pbData.PosX, cars.ContainsKey(vid) ? cars[vid].transform.localPosition.y : 0f, pbData.PosZ);
+            masterRotation = new Quaternion(pbData.RotX, pbData.RotY, pbData.RotZ, pbData.RotW);
 
             if (cars.ContainsKey(vid))
             {
@@ -95,69 +92,58 @@ namespace Assets.GRL.Scripts.Managers
             }
             else
             {
-                Debug.Log("MasterTelemetrySubscriber: Car with vid " + telemetryData.vid + " not found in cars dictionary.");
+                Debug.Log("MasterTelemetrySubscriber: Car with vid " + pbData.Vid + " not found in cars dictionary.");
             }
-
-            //Velocity = new Vector3(telemetryData.velX, 0, telemetryData.velZ).magnitude;
         }
+
         private void handleVRaceStateData(VRaceStateData vRaceStateData)
         {
-            //Debug.Log($"Offtrack || Overlap: {vRaceStateData.overlapFlag || vRaceStateData.offtrackFlag}");
-
             IsOffTrack = vRaceStateData.offtrackFlag;
             IsOverlapping = vRaceStateData.overlapFlag;
-
         }
 
         protected void DecodeMessage(string topic, byte[] message)
         {
-
-            // Safely check the topic length before splitting
             string[] topicSegments = topic.Split('/');
             if (topicSegments.Length < 5) return;
 
             var vid = topicSegments[4];
             if (!cars.ContainsKey(vid)) return;
 
-            string msgRaw = System.Text.Encoding.UTF8.GetString(message);
-
-
             try
             {
-                //Debug.Log("MasterTelemetrySubscriber msgRaw: " + msgRaw);
-
                 if (topic.Contains("telemetry"))
                 {
-                    TelemetryData telemetryData = new TelemetryData(msgRaw);
-                    handleTelemetryData(telemetryData);
+                    // DIRECT BINARY DESERIALIZATION: Zero string allocation overhead[cite: 3]
+                    Telemetry pbData = Telemetry.Parser.ParseFrom(message);
+                    handleTelemetryData(pbData);
                 }
-
-                if (topic.Contains("vracestate"))
+                else
                 {
-                    IsOffTrack = false;
-                    IsOverlapping = false;
-                    //Debug.Log("msg: " + msg);
-                    VRaceStateData vRaceStateData = new VRaceStateData(msgRaw);
-                    handleVRaceStateData(vRaceStateData);
+                    // Fallback string conversion ONLY for legacy JSON event messages
+                    string msgRaw = System.Text.Encoding.UTF8.GetString(message);
+
+                    if (topic.Contains("vracestate"))
+                    {
+                        IsOffTrack = false;
+                        IsOverlapping = false;
+                        VRaceStateData vRaceStateData = new VRaceStateData(msgRaw);
+                        handleVRaceStateData(vRaceStateData);
+                        StoreMessage(msgRaw);
+                    }
+                    else if (topic.Contains("lapupdate"))
+                    {
+                        LapData lapData = new LapData(msgRaw);
+                        CurrentLap = lapData.lap;
+                        handleLapUpdate(lapData);
+                        StoreMessage(msgRaw);
+                    }
                 }
-
-                if (topic.Contains("lapupdate"))
-                {
-                    LapData lapData = new LapData(msgRaw);
-                    CurrentLap = lapData.lap;
-
-                    handleLapUpdate(lapData);
-                }
-
-                
-
-                StoreMessage(msgRaw);
             }
             catch (Exception e)
             {
-                Debug.Log("MasterTelemetrySubscriber TelemetryData EXCEPTION: " + e.Message);
+                Debug.Log("MasterTelemetrySubscriber Decode EXCEPTION: " + e.Message);
             }
-
         }
 
         private void StoreMessage(string eventMsg)
@@ -165,18 +151,10 @@ namespace Assets.GRL.Scripts.Managers
             eventMessages.Add(eventMsg);
         }
 
-        private void ProcessMessage(string msg)
-        {
-            //Debug.Log("MasterTelemetrySubscriber Received: " + msg);
-        }
+        private void ProcessMessage(string msg) { }
 
-        /// <summary>
-        /// Fixed update network.
-        /// </summary>
         public override void FixedUpdateNetwork()
         {
-            //base.Update(); // call ProcessMqttEvents()
-
             if (eventMessages.Count > 0)
             {
                 foreach (string msg in eventMessages)
@@ -185,8 +163,6 @@ namespace Assets.GRL.Scripts.Managers
                 }
                 eventMessages.Clear();
             }
-
         }
-
     }
 }

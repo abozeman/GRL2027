@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 522ec5d148abea6489635fa948489bc5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421058
+  packageName: Free Dissolve Shader Pack - URP
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Dissolve Shader Collection - URP/Scripts/ERIC_DissolveAmountAnimator.cs
+  uploadId: 1028536

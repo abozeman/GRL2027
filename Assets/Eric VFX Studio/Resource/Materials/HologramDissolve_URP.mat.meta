@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e24f0d398e5eba24a827c64c59fe33e8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421058
+  packageName: Free Dissolve Shader Pack - URP
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Materials/HologramDissolve_URP.mat
+  uploadId: 1028536

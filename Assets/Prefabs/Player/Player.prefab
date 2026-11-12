@@ -124,7 +124,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4456525917334851856}
   - component: {fileID: 5761771852899755725}
-  - component: {fileID: 3510235967792793561}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -165,20 +164,5 @@ MonoBehaviour:
   EnableInterpolation: 1
   Flags: 262146
   NestedObjects: []
-  NetworkedBehaviours:
-  - {fileID: 3510235967792793561}
+  NetworkedBehaviours: []
   ForceRemoteRenderTimeframe: 0
---- !u!114 &3510235967792793561
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3872995868953279912}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f2a53ade19a4484bb5b6a56eafc469a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.Player.PlayerInputProvider
-  ERLLeftStick: {fileID: 1584157723050965039, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}
-  ERLRightStick: {fileID: 9176000218046303869, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}

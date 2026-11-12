@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 94162768f54422f45bf8d6fa4c1c72ad
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 421058
+  packageName: Free Dissolve Shader Pack - URP
+  packageVersion: 1.0
+  assetPath: Assets/Eric VFX Studio/Resource/Shader/ERIC_TopDownDissolve_URP.shader
+  uploadId: 1028536

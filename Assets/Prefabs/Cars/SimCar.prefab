@@ -621,8 +621,9 @@ GameObject:
   - component: {fileID: 6944370793633180429}
   - component: {fileID: 4180487851149503529}
   - component: {fileID: 2356380406223126955}
-  - component: {fileID: 1746317061539311714}
   - component: {fileID: 6857537048276100602}
+  - component: {fileID: 2085841105405445891}
+  - component: {fileID: 1631116780215298437}
   m_Layer: 0
   m_Name: SimCar
   m_TagString: Untagged
@@ -710,6 +711,8 @@ MonoBehaviour:
   - {fileID: 4180487851149503529}
   - {fileID: 2356380406223126955}
   - {fileID: 6857537048276100602}
+  - {fileID: 2085841105405445891}
+  - {fileID: 1631116780215298437}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4180487851149503529
 MonoBehaviour:
@@ -723,10 +726,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6297125a567c1ae41b18172f93eaf0b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.CarInputManagerLive
-  _carControlPublisher: {fileID: 1746317061539311714}
+  _carControlPublisher: {fileID: 0}
   _IsSimulated:
     RawValue: 1
-  MoveSpeed: 15
+  MoveSpeed: 1
   TurnSpeed: 60
 --- !u!114 &2356380406223126955
 MonoBehaviour:
@@ -743,19 +746,6 @@ MonoBehaviour:
   _levelId: 0
   _colorId: 0
   _vid: 
---- !u!114 &1746317061539311714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8525085160519899942}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3cd0c54570f4f047a7febe15ea0002c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Assets.CryptoKartz.Scripts.Managers.CarControlDataLivePublisher
-  vid: grlsimracer1
 --- !u!114 &6857537048276100602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -775,3 +765,33 @@ MonoBehaviour:
     _length: 4
     _data:
       Data: 540000006f0000006e0000007900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+--- !u!114 &2085841105405445891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525085160519899942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f2a53ade19a4484bb5b6a56eafc469a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.Player.PlayerInputProvider
+  ERLLeftStick: {fileID: 1584157723050965039, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}
+  ERLRightStick: {fileID: 9176000218046303869, guid: 670a02f41ed70d54b8dfdb5d2418ae0f, type: 3}
+--- !u!114 &1631116780215298437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525085160519899942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2af33cd62d01e3f43ae97be558886de8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.SimulatedCarTelemetryPublisher
+  _inputManager: {fileID: 4180487851149503529}
+  RaceId: default_race
+  Vid: grlsimracer1
+  PublishRate: 0.033

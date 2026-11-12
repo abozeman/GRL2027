@@ -1,5 +1,6 @@
 using Assets.GRL.Scripts;
 using Assets.GRL.Scripts.Managers;
+using Assets.GRL.Scripts.Player;
 using Assets.Scripts.Managers;
 using cryptokartz.Scripts.Car;
 using cryptokartz.Scripts.Player;
@@ -24,6 +25,8 @@ public class LiveCarSpawnManager : NetworkBehaviour
         if (Object.Runner.IsServer)
         {
             GetComponent<CarInputManagerLive>().enabled = true;
+            GetComponent<PlayerInputProvider>().enabled = false;
+
             GetComponent<CarInputManagerLive>().IsSimulated = false;
             GetComponent<CarControlDataLivePublisher>().enabled = false;
 
@@ -44,6 +47,7 @@ public class LiveCarSpawnManager : NetworkBehaviour
         }
         else
         {
+            GetComponent<PlayerInputProvider>().enabled = true;
             GetComponent<CarInputManagerLive>().enabled = false;
             GetComponent<CarControlDataLivePublisher>().enabled = true;
 

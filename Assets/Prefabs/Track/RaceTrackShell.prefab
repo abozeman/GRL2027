@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1713498056521086458}
   - component: {fileID: 5243160247351971051}
   - component: {fileID: 2168714008141207826}
+  - component: {fileID: 735731717789510163}
   m_Layer: 0
   m_Name: RaceTrackShell
   m_TagString: Untagged
@@ -56,6 +57,7 @@ MonoBehaviour:
   - {fileID: 1713498056521086458}
   - {fileID: 5243160247351971051}
   - {fileID: 2168714008141207826}
+  - {fileID: 735731717789510163}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1713498056521086458
 MonoBehaviour:
@@ -85,6 +87,8 @@ MonoBehaviour:
   RestClientTrackGenerator: {fileID: 0}
   _TrackId: helenV2
   _LevelId: 1
+  _IsTrackLoaded:
+    RawValue: 0
   _ExteriorCoordinates: []
   _ExteriorCoordinatesLength: 0
   _InteriorCoordinates: []
@@ -108,5 +112,23 @@ MonoBehaviour:
   TrackStartline: {fileID: 3921426343606308411, guid: faf3a77048a717847951f80dd688a6a3, type: 3}
   TrackSurface: {fileID: 2862788345809905930, guid: 93cc4cd6cfb69584f905c2ea45fd6097, type: 3}
   trackIsRendered: 0
-  trackIsReady: 0
-  isTestMode: 1
+--- !u!114 &735731717789510163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6860906129467054461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1798e2e088bf60478417bd93db0725e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaceAnimationController
+  _preRaceMaterializationVFX: {fileID: 5444105318733727396, guid: cf82839c411151342a7b2337bda9fb34, type: 3}
+  _holographicStartLightAnimator: {fileID: 0}
+  _spectatorUIGlitchAnimator: {fileID: 0}
+  _mainCamera: {fileID: 0}
+  _announcerAudioSource: {fileID: 0}
+  _countdownClip: {fileID: 0}
+  _greenFlagClip: {fileID: 0}
+  _checkeredFlagClip: {fileID: 0}

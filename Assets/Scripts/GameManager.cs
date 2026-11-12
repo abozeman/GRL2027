@@ -25,6 +25,7 @@ namespace cryptokartz.Scripts.GameControllers
         [SerializeField] private NetworkObject _simCarPrefab;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerMap = new Dictionary<PlayerRef, NetworkObject>();
+        private readonly Dictionary<PlayerRef, NetworkObject> _carMap = new Dictionary<PlayerRef, NetworkObject>();
         private struct QueuedMessage
         {
             public string Topic;
@@ -163,14 +164,20 @@ namespace cryptokartz.Scripts.GameControllers
 
             Debug.Log($"[GameManager] PlayerRef {player.PlayerId} joined as {clientPlatform}. Race Type is {RaceType}");
 
+            // PHYSICAL COMPETITOR: Spawn the floating VR Avatar 
+            NetworkObject character = grlAvatarSpawn(_playerPrefab, player);
+            _playerMap[player] = character;
+            runner.SetPlayerObject(player, character);
+            Debug.Log("[GameManager] User connected. Avatar spawned.");
+
             // 2. The Gatekeeper Logic
             if (RaceType == "practice" && (clientPlatform == "WEBXR" || clientPlatform == "QUEST"))
             {
                 // PURE SIMULATION: Spawn a simulated car and grant browser input authority
                 NetworkObject simCar = grlSimulatedCarSpawn(_simCarPrefab, player);
-                _playerMap[player] = simCar;
-                runner.SetPlayerObject(player, simCar);
+                _carMap[player] = simCar;
                 Debug.Log("[GameManager] Granted WebXR user a simulated car for practice.");
+
             }
             else if (RaceType == "live" && clientPlatform == "WEBXR")
             {
@@ -181,10 +188,10 @@ namespace cryptokartz.Scripts.GameControllers
             else if (RaceType == "live" && clientPlatform == "QUEST")
             {
                 // PHYSICAL COMPETITOR: Spawn the floating VR Avatar 
-                NetworkObject character = grlAvatarSpawn(_playerPrefab, player);
-                _playerMap[player] = character;
-                runner.SetPlayerObject(player, character);
-                Debug.Log("[GameManager] Quest user connected. Avatar spawned.");
+                //NetworkObject character = grlAvatarSpawn(_playerPrefab, player);
+                //_playerMap[player] = character;
+                //runner.SetPlayerObject(player, character);
+                //Debug.Log("[GameManager] Quest user connected. Avatar spawned.");
             }
 
             // 3. Database Registration (Run for everyone who connects)
@@ -198,73 +205,41 @@ namespace cryptokartz.Scripts.GameControllers
 
             string mockUserId = System.Guid.NewGuid().ToString();
             string mockWallet = "0xMockWalletAddress123456789";
-            //StartCoroutine(WaitAndRegisterContestant(runner, mockUserId, mockWallet, "{}"));
+            BroadcastActiveRoster();
         }
 
-        //private IEnumerator WaitAndRegisterContestant(NetworkRunner runner, string userId, string walletAddress, string carConfigJson)
-        //{
-        //    string raceId = string.Empty;
+        private void BroadcastActiveRoster()
+        {
+            if (M2MqttUnityClientNetwork.Instance == null || Runner == null) return;
 
-        //    // Loop until the ServerManager successfully injects the valid UUID into the properties
-        //    while (string.IsNullOrEmpty(raceId) || raceId == "unknown")
-        //    {
-        //        if (runner.SessionInfo.Properties.TryGetValue("raceId", out var typeProp))
-        //        {
-        //            raceId = typeProp;
-        //        }
+            // Create a simple list of active contestant identifiers
+            List<string> activeRoster = new List<string>();
 
-        //        if (string.IsNullOrEmpty(raceId) || raceId == "unknown")
-        //        {
-        //            yield return new WaitForSeconds(0.5f); // Wait half a second and check again
-        //        }
-        //    }
+            foreach (var kvp in _playerMap)
+            {
+                PlayerRef pRef = kvp.Key;
+                NetworkObject netObj = kvp.Value;
 
-        //    Debug.Log($"[Database] raceId : {raceId}");
+                // Extract their persistent ID (e.g., from the ConnectionToken or a Networked variable on their avatar)
+                byte[] tokenBytes = Runner.GetPlayerConnectionToken(pRef);
+                string clientPlatform = tokenBytes != null ? System.Text.Encoding.UTF8.GetString(tokenBytes) : "UNKNOWN";
 
+                // For this example, we just use their PlayerId and Platform, but you can include their username or VID
+                activeRoster.Add($"Player_{pRef.PlayerId}_{clientPlatform}");
+            }
 
-        //    // Once we have a valid UUID, execute the actual API payload
-        //    StartCoroutine(RegisterContestantInDatabaseCoroutine(runner.SessionInfo.Name, userId, walletAddress, raceId, carConfigJson));
-        //}
+            // Serialize and Publish
+            string rosterJson = Newtonsoft.Json.JsonConvert.SerializeObject(new
+            {
+                race_id = Runner.SessionInfo.Name,
+                contestants = activeRoster,
+                timestamp = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            });
 
-        //private IEnumerator RegisterContestantInDatabaseCoroutine(string roomName, string userId, string walletAddress, string raceId,string carConfigJson)
-        //{
-        //    //string url = $"http://192.168.2.49:8001/api/contestants/join";
-
-        //    // Build the payload mapping to your Flask API fields
-        //    //string jsonPayload = $@"{{
-        //    //    ""race_id"": ""{raceId}"", 
-        //    //    ""user_id"": ""{userId}"", 
-        //    //    ""wallet_address"": ""{walletAddress}"", 
-        //    //    ""car_config"": {carConfigJson}
-        //    //}}";
-
-
-        //    string url = $"http://192.168.2.49:8001/api/contestants/join";
-        //    Debug.Log($"[Database] url : {url}");
-
-        //    //string url = $"{API_BASE_URL}/races/create";
-        //    string jsonPayload = $"{{\"race_id\":\"{raceId}\", \"user_id\":\"{userId}\", \"wallet_address\":\"{walletAddress}\", \"car_config\":\"{carConfigJson}\"}}";
-        //    Debug.Log($"[Database] jsonPayload : {jsonPayload}");
-
-        //    using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
-        //    {
-        //        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonPayload);
-        //        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        //        request.downloadHandler = new DownloadHandlerBuffer();
-        //        request.SetRequestHeader("Content-Type", "application/json");
-
-        //        yield return request.SendWebRequest();
-
-        //        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        //        {
-        //            Debug.LogError($"[Database] Failed to register contestant in room {roomName}: {request.error} | Response: {request.downloadHandler.text}");
-        //        }
-        //        else
-        //        {
-        //            Debug.Log($"[Database] Successfully registered contestant in room {roomName}. Response: {request.downloadHandler.text}");
-        //        }
-        //    }
-        //}
+            string topic = $"race/{Runner.SessionInfo.Name}/roster";
+            M2MqttUnityClientNetwork.Instance.client.Publish(topic, System.Text.Encoding.UTF8.GetBytes(rosterJson));
+            Debug.Log($"[GameManager] Broadcasted updated roster: {activeRoster.Count} contestants.");
+        }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
