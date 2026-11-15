@@ -27,7 +27,7 @@ namespace Assets.GRL.Scripts.Managers
         public float Velocity;
         public string SessionName;
 
-        public Dictionary<string, GameObject> cars = new Dictionary<string, GameObject>();
+        public Dictionary<string, GameObject> cars;
 
         public override void Spawned()
         {

@@ -20,10 +20,32 @@ public class RoomSetupManager : MonoBehaviour
     public GameObject raceButtonPrefab; // Assign this in the Unity Inspector
     public GameObject _targetButton { get; set; } // Assign this in the Unity Inspector
     public TextAsset WarehouseJSON;
+    public LobbyTrackPlacementManager trackPlacementManager;
 
     private bool uiReady = false;
 
+    private void OnEnable()
+    {
+        if (trackPlacementManager != null)
+        {
+            trackPlacementManager.OnPlacementSpotSelected += HandleSpotSelected;
+        }
+    }
 
+    private void OnDisable()
+    {
+        if (trackPlacementManager != null)
+        {
+            trackPlacementManager.OnPlacementSpotSelected -= HandleSpotSelected;
+        }
+    }
+
+    // 2. This triggers ONLY when the user (or the auto-sorter) selects a spot
+    private void HandleSpotSelected()
+    {
+        Debug.Log("[RoomSetupManager] Spot selected! Fetching races and joining game...");
+        GetRaces();
+    }
 
     private async void Start()
     {
@@ -101,14 +123,11 @@ public class RoomSetupManager : MonoBehaviour
     {
         // STEP 3: The ultimate success state.
         Debug.Log($"[MRUK] Room generated successfully! Found {room.Anchors.Count} anchors.");
-
-        GetRaces();
-
     }
 
 
 
-    private void GetRaces()
+    public void GetRaces()
     {
         // TODO: Call the API you already wrote.
         // E.g., StartCoroutine(CallMyCustomAPI(metaUserId, metaUserName));
@@ -137,18 +156,34 @@ public class RoomSetupManager : MonoBehaviour
 
     private System.Collections.IEnumerator WaitAndClickRoutine()
     {
-        Debug.Log("[Desktop Mode] UI populated. Waiting 30 seconds before auto-clicking...");
+        Debug.Log("[Desktop Mode] UI populated. Waiting 5 seconds before auto-clicking...");
 
         // Pause execution for 30 seconds
-        yield return new WaitForSeconds(30f);
+        yield return new WaitForSeconds(5f);
 
         // Grab the first button that was dynamically generated in the UI container
         GRLRaceButtonClickHandller[] availableButtons = raceUIButtonContainer.GetComponentsInChildren<GRLRaceButtonClickHandller>();
 
         if (availableButtons != null && availableButtons.Length > 0)
         {
-            Debug.Log("[Desktop Mode] 30 seconds reached! Artificially clicking the target race button.");
-            availableButtons[0].HandleClick();
+            for(int i = 0; i < availableButtons.Length; i++)
+            {
+                Race raceInfo = availableButtons[i].GetComponent<GRLRaceButtonClickHandller>()._raceInfo;
+                if(raceInfo != null)
+                {
+                    if(raceInfo.status != "FINISHED")
+                    {
+                        availableButtons[i].HandleClick(); // Assign the first non-finished button as the target
+                        Debug.Log($"[Desktop Mode] Button {i} - Lobby: {raceInfo.lobby_name}, Room: {raceInfo.room_name}, Status: {raceInfo.status}");
+                        Debug.Log($"[Desktop Mode] Found button {i}: {availableButtons[i].gameObject.name}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[Desktop Mode] Button {i} has no race info assigned!");
+                }
+            }
+            Debug.Log("[Desktop Mode] 5 seconds reached! Artificially clicking the target race button.");
         }
         else
         {
@@ -175,11 +210,6 @@ public class RoomSetupManager : MonoBehaviour
                 GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
                 raceButton.GetComponent<GRLRaceButtonClickHandller>()._raceInfo = race;
                 raceButton.AddComponent<ClientManager>(); // Add the ClientManager component to the button
-
-                if (_targetButton == null && race.status != "FINISHED")
-                {
-                    _targetButton = raceButton; // Assign the first button as the target if not already set
-                }
 
                 // Highly recommended for UI elements to prevent weird stretching
                 raceButton.transform.localScale = Vector3.one;

@@ -10,42 +10,59 @@ namespace Assets.GRL.Scripts.Managers
     {
         public async Task<StartGameResult> StartClient(string lobbyName, string raceName)
         {
-            SceneRef sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+            try
+            {
+                Debug.Log($"[ClientManager] Starting client for lobby: {lobbyName}, race: {raceName}");
 
-            // 1. Instantiate the Client Runner
-            NetworkRunner runnerClient = GetRunner("Client");
+                SceneRef sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
+                Debug.Log($"[ClientManager] Got the SceneRef: {sRef}");
 
-            // 1. Identify the platform automatically at compile time
-            string clientPlatform = "QUEST";
-            #if UNITY_WEBGL
+                // 1. Instantiate the Client Runner
+                NetworkRunner runnerClient = GetRunner("Client");
+                Debug.Log($"[ClientManager] Got the Client Runner: {lobbyName}, race: {raceName}");
+
+
+                // 1. Identify the platform automatically at compile time
+                string clientPlatform = "QUEST";
+#if UNITY_WEBGL
                     clientPlatform = "WEBXR";
-            #endif
+#endif
 
-            // 2. Convert to a byte array for Fusion's ConnectionToken
-            byte[] tokenBytes = System.Text.Encoding.UTF8.GetBytes(clientPlatform);
+                Debug.Log($"[ClientManager] ClientPlatform: {clientPlatform}");
+
+                // 2. Convert to a byte array for Fusion's ConnectionToken
+                byte[] tokenBytes = System.Text.Encoding.UTF8.GetBytes(clientPlatform);
 
 
-            // 2. Start the game natively. Fusion handles the scene load and connection automatically.
-            var result = await runnerClient.StartGame(new StartGameArgs()
-            {
-                CustomLobbyName = lobbyName,
-                SessionName = raceName,
-                GameMode = GameMode.Client, // Strictly Client mode
-                SceneManager = runnerClient.gameObject.AddComponent<NetworkSceneManagerDefault>(),
-                Scene = sRef,
-                ConnectionToken = tokenBytes // Inject the token here
-            });
+                // 2. Start the game natively. Fusion handles the scene load and connection automatically.
+                var result = await runnerClient.StartGame(new StartGameArgs()
+                {
+                    CustomLobbyName = lobbyName,
+                    SessionName = raceName,
+                    GameMode = GameMode.Client, // Strictly Client mode
+                    SceneManager = runnerClient.gameObject.AddComponent<NetworkSceneManagerDefault>(),
+                    Scene = sRef,
+                    ConnectionToken = tokenBytes // Inject the token here
+                });
 
-            if (result.Ok)
-            {
-                Debug.Log($"[ClientManager] Successfully joined session {raceName} as a Client.");
+                if (result.Ok)
+                {
+                    Debug.Log($"[ClientManager] Successfully joined session {raceName} as a Client.");
+                }
+                else
+                {
+                    Debug.LogError($"[ClientManager] Failed to join session: {result.ShutdownReason}");
+                }
+
+                return result;
+
             }
-            else
+            catch (System.Exception ex)
             {
-                Debug.LogError($"[ClientManager] Failed to join session: {result.ShutdownReason}");
+                Debug.LogError($"[ClientManager] Failed to join session exception: {ex.Message}");
             }
 
-            return result;
+            return null;
         }
 
         private NetworkRunner GetRunner(string name)
@@ -66,7 +83,7 @@ namespace Assets.GRL.Scripts.Managers
             }
             else
             {
-                Debug.LogError($"Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
+                Debug.LogError($"[ClientManager] Failed to create SceneRef: '{scenePath}' is not in the Build Settings.");
                 return default;
             }
         }

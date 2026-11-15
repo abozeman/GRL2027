@@ -13,6 +13,7 @@ using System.Text;            // Added for payload encoding
 using UnityEngine;
 using UnityEngine.Networking; // Added for REST API
 using uPLibrary.Networking.M2Mqtt.Messages;
+using static RaceAnimationController;
 
 namespace cryptokartz.Scripts.GameControllers
 {
@@ -23,6 +24,8 @@ namespace cryptokartz.Scripts.GameControllers
         [SerializeField] private NetworkObject _liveCarPrefab;
         [SerializeField] private NetworkObject _ghostCarPrefab;
         [SerializeField] private NetworkObject _simCarPrefab;
+        private GameObject _trackPlatform;
+        RaceAnimationController raceAnimationController;
 
         private readonly Dictionary<PlayerRef, NetworkObject> _playerMap = new Dictionary<PlayerRef, NetworkObject>();
         private readonly Dictionary<PlayerRef, NetworkObject> _carMap = new Dictionary<PlayerRef, NetworkObject>();
@@ -44,26 +47,42 @@ namespace cryptokartz.Scripts.GameControllers
 
         public void Spawned()
         {
-            SessionName = Runner.SessionInfo.Name.ToLower();
-            Debug.Log($"[GameManager] has Spawned in room: {SessionName}");
-
-            // Read the Race Type passed down from the Orchestrator/Database
-            if (Runner.SessionInfo.Properties.TryGetValue("raceType", out var typeProp))
+            if (Runner == null)
             {
-                RaceType = typeProp;
+                Debug.LogError("[GameManager] Runner is null in Spawned(). This should never happen.");
+                return;
             }
 
-            Debug.Log($"[GameManager] Spawned in room: {SessionName} | Race Type: {RaceType}");
-
-
-            if (M2MqttUnityClientNetwork.Instance != null && Runner != null)
+            if (Runner.IsServer)
             {
-                // Subscribe to the global event
-                M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+                SessionName = Runner.SessionInfo.Name.ToLower();
+                Debug.Log($"[GameManager] has Spawned in room: {SessionName}");
 
-                string scopedTopic = $"game/manager/{SessionName}/#";
-                M2MqttUnityClientNetwork.Instance.SubscribeToTopic(scopedTopic);
-                Debug.Log($"[GameManager] Hooked into Singleton and subscribed to {scopedTopic}");
+                // Read the Race Type passed down from the Orchestrator/Database
+                if (Runner.SessionInfo.Properties.TryGetValue("raceType", out var typeProp))
+                {
+                    RaceType = typeProp;
+                }
+
+                Debug.Log($"[GameManager] Spawned in room: {SessionName} | Race Type: {RaceType}");
+
+
+                if (M2MqttUnityClientNetwork.Instance != null && Runner != null)
+                {
+                    // Subscribe to the global event
+                    M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
+
+                    string commandTopic = $"game/manager/{SessionName}/#";
+                    M2MqttUnityClientNetwork.Instance.SubscribeToTopic(commandTopic);
+                    Debug.Log($"[GameManager] Hooked into Singleton and subscribed to {commandTopic}");
+                   
+                }
+
+            }
+            else
+            {
+                Debug.Log($"[GameManager] Spawned as Client in room: {Runner.SessionInfo.Name}");
+
             }
         }
 
@@ -81,19 +100,28 @@ namespace cryptokartz.Scripts.GameControllers
 
         protected void DecodeMessage(string topic, byte[] message)
         {
+            if (topic.Contains($"telemetry")) return;
+
+            Debug.Log($"[GameManager] Topic: {topic}");
+
+
             try
             {
                 string msg = System.Text.Encoding.UTF8.GetString(message);
                 string myRoomName = Runner.SessionInfo.Name.ToLower();
 
-                if (!topic.Contains($"game/manager/{myRoomName}")) return;
+                Debug.Log($"[GameManager] Topic | Message: {topic} | {msg}");
 
-                // FIX 2: Do NOT spawn here! Just queue it for FixedUpdateNetwork
-                eventMessages.Add(new QueuedMessage { Topic = topic, Payload = msg });
+
+                if (topic.Contains($"game/manager/{myRoomName}"))
+                {
+                    eventMessages.Add(new QueuedMessage { Topic = topic, Payload = msg });
+                }
+
             }
             catch (Exception e)
             {
-                Debug.LogError($"[GameManager] DecodeMessage EXCEPTION: {e.Message}");
+                Debug.LogError($"[GameManager] DecodeMessage EXCEPTION: {e.StackTrace}");
             }
         }
 
@@ -138,16 +166,11 @@ namespace cryptokartz.Scripts.GameControllers
                         NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
                     }
                 }
-                else if (topic.Contains("updatetrack"))
-                {
-                    UpdateRaceTrackConfig raceTrackConfig = new UpdateRaceTrackConfig(msg);
-                    int rtLevel = int.Parse(raceTrackConfig.RacePlatformLevel);
-                    GetTrackDefinitionManager(rtLevel).TrackId = raceTrackConfig.trackId;
-                }
             }
             catch (Exception e)
             {
                 Debug.LogError($"[GameManager] ProcessMessage EXCEPTION: {e.Message}");
+                Debug.LogError($"[GameManager] ProcessMessage StackTrace: {e.StackTrace}");
             }
         }
 
@@ -331,6 +354,10 @@ namespace cryptokartz.Scripts.GameControllers
                 default: return new Vector3(0, 1.07f, 0);
             }
         }
+
+        
+
+
         #endregion
 
         #region Unused Callbacks
@@ -434,7 +461,6 @@ namespace cryptokartz.Scripts.GameControllers
 
         void INetworkRunnerCallbacks.OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
-            throw new NotImplementedException();
         }
         #endregion
     }

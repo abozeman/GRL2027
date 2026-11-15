@@ -26,9 +26,9 @@ public class GhostCarSpawnManager : NetworkBehaviour
             _vid = Object.GetComponent<CarDataNetwork>().Vid;
 
             //Find the Track in this Session and attach the car to it
-            string objFind = $"RaceTrackShell1";
-            _trackPlatform = FindInRunnerScene(objFind);
-            transform.SetParent(_trackPlatform.transform);
+            //string objFind = $"RaceTrackShell1";
+            //_trackPlatform = FindInRunnerScene(objFind);
+            //transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
 
             //find the MasterTelemetry Subscriber and register the car with it

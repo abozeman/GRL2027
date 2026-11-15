@@ -16,7 +16,7 @@ namespace Assets.GRL.Scripts
 
         // Adjust these to make the simulated car feel right in the browser
         public float MoveSpeed = 15f;
-        public float TurnSpeed = 60f;
+        public float TurnSpeed = 100f;
 
         public override void FixedUpdateNetwork()
         {

@@ -429,6 +429,7 @@ GameObject:
   - component: {fileID: 889659517}
   - component: {fileID: 889659516}
   - component: {fileID: 889659518}
+  - component: {fileID: 889659519}
   m_Layer: 0
   m_Name: RoomManager
   m_TagString: Untagged
@@ -450,7 +451,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   raceUIButtonContainer: {fileID: 2134480856}
   raceButtonPrefab: {fileID: 688320000250573698, guid: 9fb3652628afd924aa3cd12cb9d5269e, type: 3}
-  WarehouseJSON: {fileID: 4900000, guid: 5d6d9d58454eed44c98659c6931abc3e, type: 3}
+  WarehouseJSON: {fileID: 4900000, guid: 5c5e77c0c4870e64eb274065a967b919, type: 3}
+  trackPlacementManager: {fileID: 889659519}
 --- !u!4 &889659517
 Transform:
   m_ObjectHideFlags: 0
@@ -479,6 +481,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.Managers.ClientManager
   _runnerClientPrefab: {fileID: 3456802343237632205, guid: 146b653c38070b946b38832f6c26cecf, type: 3}
+--- !u!114 &889659519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 889659515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d46671787e71d37438754fe597214609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyTrackPlacementManager
+  trackPreviewPrefab: {fileID: 8204590873778396977, guid: b730de5ed0b7b304f9a6f39603c885ef, type: 3}
+  validLabels: 1
+  surfaceClearanceDistance: 0.05
+  previewScale: 0.25
+  currentSortMode: 2
+  maxFieldOfViewAngle: 75
 --- !u!1 &937299632
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,6 +579,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d3ea604c9c48a24eafabe192f84217d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalXRPersistence
+  selectedTrackAnchor: {fileID: 0}
+  trackGameObjectName: RaceTrackShell1
 --- !u!1 &1102877817
 GameObject:
   m_ObjectHideFlags: 0

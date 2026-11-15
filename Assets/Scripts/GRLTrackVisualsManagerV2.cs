@@ -12,11 +12,14 @@ namespace Assets.CryptoKartz.Scripts
         public GameObject TrackInterior;
         public GameObject TrackStartline;
         public GameObject TrackSurface;
+        public GameObject RaceLights;
 
         private GameObject m_TrackSurface;
         private GameObject m_TrackExterior;
         private GameObject m_TrackInterior;
         private GameObject m_TrackStartline;
+        private GameObject m_RaceLights;
+        private GameObject m_raceAnimationController;
 
         public bool trackIsRendered = false;
         private LineRenderer m_exteriorLineRenderer;
@@ -40,6 +43,12 @@ namespace Assets.CryptoKartz.Scripts
                 m_TrackExterior = Instantiate(TrackExterior, m_TrackSurface.transform, false);
                 m_TrackInterior = Instantiate(TrackInterior, m_TrackSurface.transform, false);
                 m_TrackStartline = Instantiate(TrackStartline, m_TrackSurface.transform, false);
+                m_RaceLights = Instantiate(RaceLights, transform.parent, false);
+                m_RaceLights.transform.localPosition = new Vector3(0f, 0f, 0f);
+                m_RaceLights.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+                m_raceAnimationController = GameObject.Find("RaceAnimationController");
+                m_raceAnimationController.GetComponent<RaceAnimationController>().AddRaceLightsAnimator(m_RaceLights.GetComponent<Animator>());
 
                 // LATE-JOINER CATCH: Use our new highly reliable NetworkBool!
                 if (_trackDefinitionManager.IsTrackLoaded)
