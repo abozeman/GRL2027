@@ -2,7 +2,7 @@
     "Version": 1,
     "TypeId": "NetworkProjectConfig",
     "HubMode": 2,
-    "PeerMode": 0,
+    "PeerMode": 1,
     "LagCompensation": {
         "Enabled": true,
         "HitboxBufferLengthInMs": 200,
@@ -31,7 +31,7 @@
         },
         "InputTransferMode": 0,
         "SimulationUpdateTimeMode": 0,
-        "PlayerCount": 10,
+        "PlayerCount": 1,
         "TickRateSelection": {
             "Client": 0,
             "ClientSendInterval": 0,

@@ -12,8 +12,14 @@ namespace Assets.GRL.Scripts.Models
         public string RacePlatformLevel;
         public string TrackId;
         public string RaceType;
+        public int LapTarget;
 
-        // Constructor that takes the raw MQTT JSON string and maps it to these variables
+
+        // The dynamically assigned timing durations
+        public int PreRaceSecs;
+        public int AcceptContestantsSecs;
+        public int CountdownSecs;
+
         public CreateRaceConfig(string jsonMsg)
         {
             try
@@ -22,7 +28,7 @@ namespace Assets.GRL.Scripts.Models
             }
             catch (Exception e)
             {
-                Debug.LogError($"[Config] Failed to parse CreateRaceTrackConfig JSON: {e.Message}");
+                Debug.LogError($"[Config] Failed to parse CreateRaceConfig JSON: {e.Message}");
             }
         }
     }

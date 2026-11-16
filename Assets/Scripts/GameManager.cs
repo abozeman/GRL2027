@@ -113,7 +113,7 @@ namespace cryptokartz.Scripts.GameControllers
                 Debug.Log($"[GameManager] Topic | Message: {topic} | {msg}");
 
 
-                if (topic.Contains($"game/manager/{myRoomName}"))
+                if (topic.StartsWith($"game/manager/{myRoomName}"))
                 {
                     eventMessages.Add(new QueuedMessage { Topic = topic, Payload = msg });
                 }

@@ -540,6 +540,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1061453899}
   - component: {fileID: 1061453900}
+  - component: {fileID: 1061453901}
   m_Layer: 0
   m_Name: Local_XR_Environment
   m_TagString: Untagged
@@ -581,6 +582,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalXRPersistence
   selectedTrackAnchor: {fileID: 0}
   trackGameObjectName: RaceTrackShell1
+--- !u!114 &1061453901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061453898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf4e6db43f28079418e2ca71b03d3017, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrackCameraFramer
+  trackTarget: {fileID: 0}
 --- !u!1 &1102877817
 GameObject:
   m_ObjectHideFlags: 0

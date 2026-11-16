@@ -19,9 +19,26 @@ using Application = UnityEngine.Application;
 
 namespace Assets.GRL.Scripts.Managers
 {
+    
+
     [SimulationBehaviour(Modes = SimulationModes.Server)]
     public class ServerManager : ServerManagerBaseNetwork, INetworkRunnerCallbacks
     {
+        [System.Serializable]
+        private struct CreateRacePayload
+        {
+            public string lobby_name;
+            public string room_name;
+            public string track_level_id;
+            public string track_id;
+            public string race_type;
+            public int target_laps;
+            public int pre_race_secs;
+            public int accept_contestants_secs;
+            public int countdown_secs;
+
+        }
+
         private List<string> eventMessages = new List<string>();
 
         // OMNIBUS UPGRADE: Track all active races (NetworkRunners) by their Session Name
@@ -95,7 +112,6 @@ namespace Assets.GRL.Scripts.Managers
             await Task.Yield();
             Application.targetFrameRate = 30;
 
-            // Parse Master Agent Command
             CreateRaceConfig config = new CreateRaceConfig(msg);
 
             System.Random random = new System.Random();
@@ -121,7 +137,6 @@ namespace Assets.GRL.Scripts.Managers
                 return default;
             }
 
-            // Spawn a dedicated Runner for this specific Race
             NetworkRunner newRaceRunner = Instantiate(_runnerServerPrefab);
             newRaceRunner.name = $"ServerRunner_{newSessionName}";
             newRaceRunner.ProvideInput = true;
@@ -129,16 +144,20 @@ namespace Assets.GRL.Scripts.Managers
 
             sRef = GetSceneRefFromPath("Assets/Scenes/GRLGame.unity");
 
-            // 1. Create the SessionProperties dictionary
+            // 1. Pack ALL data including dynamic durations into SessionProperties
             var sessionProperties = new Dictionary<string, SessionProperty>
             {
-                { "trackId", trackId },
-                { "racePlatformLevel", trackLevelId },
-                { "raceId", raceId },
-                { "raceType", raceType }
+                { "trackId", config.TrackId },
+                { "racePlatformLevel", config.RacePlatformLevel },
+                { "raceType", config.RaceType },
+                { "raceId", "" }, // Initialized empty; populated via API response later
+                { "lapTarget", config.LapTarget },
+                { "preRaceSecs", config.PreRaceSecs },
+                { "acceptContestantsSecs", config.AcceptContestantsSecs },
+                { "countdownSecs", config.CountdownSecs }
             };
 
-            // Start the Fusion Session (Room) inside the specified Lobby
+            // Start the Fusion Session
             var result = await StartSession(
                 newRaceRunner,
                 GameMode.Server,
@@ -148,18 +167,23 @@ namespace Assets.GRL.Scripts.Managers
                 sessionProperties
             );
 
-            // Validate and Register
             if (result.Ok)
             {
-                Debug.Log($"[Omnibus] Successfully started race room: {newSessionName} in lobby: {targetLobby}");
-
+                Debug.Log($"[Omnibus] Successfully started race room: {newSessionName}");
                 _activeRaces.Add(newSessionName, newRaceRunner);
-                StartCoroutine(RegisterRaceInDatabaseCoroutine(newRaceRunner, newSessionName, targetLobby, trackLevelId, trackId, raceType));
+
+                // 2. Trigger DB registration to generate the raceId UUID
+                StartCoroutine(RegisterRaceInDatabaseCoroutine(
+                    newRaceRunner,
+                    newSessionName,
+                    targetLobby,
+                    config
+                ));
             }
             else
             {
                 Debug.LogError($"[Omnibus] Error starting room {newSessionName}: {result.ShutdownReason}");
-               await newRaceRunner.Shutdown();
+                await newRaceRunner.Shutdown();
             }
 
             return result;
@@ -196,19 +220,33 @@ namespace Assets.GRL.Scripts.Managers
         #region Database API Calls
 
         // Pass the runner into the Coroutine so it can update the session properties
-        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(NetworkRunner runner, string roomName, string lobbyName, string trackLevelId, string trackId, string raceType)
+
+        private System.Collections.IEnumerator RegisterRaceInDatabaseCoroutine(NetworkRunner runner, string roomName, string lobbyName, CreateRaceConfig _config)
         {
             string url = $"http://192.168.2.49:8001/api/races/create";
             Debug.Log($"[Database] url : {url}");
 
-            //string url = $"{API_BASE_URL}/races/create";
-            string jsonPayload = $"{{\"lobby_name\":\"{lobbyName}\", \"room_name\":\"{roomName}\", \"track_level_id\":\"{trackLevelId}\", \"track_id\":\"{trackId}\", \"race_type\":\"{raceType}\"}}";
-            Debug.Log($"[Database] jsonPayload : {jsonPayload}");
+            // 1. Instantiate the local object mapping directly to the Python API requirements
+            var payloadObj = new CreateRacePayload
+            {
+                lobby_name = lobbyName,
+                room_name = roomName,
+                track_level_id = _config.RacePlatformLevel,
+                track_id = _config.TrackId,
+                race_type = _config.RaceType,
+                target_laps = _config.LapTarget,
+                pre_race_secs = _config.PreRaceSecs,
+                accept_contestants_secs = _config.AcceptContestantsSecs,
+                countdown_secs = _config.CountdownSecs
+            };
 
+            // 2. Serialize safely using Newtonsoft
+            string jsonPayload = Newtonsoft.Json.JsonConvert.SerializeObject(payloadObj);
+            Debug.Log($"[Database] jsonPayload : {jsonPayload}");
 
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
             {
-                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonPayload);
+                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonPayload);
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.SetRequestHeader("Content-Type", "application/json");
@@ -217,12 +255,11 @@ namespace Assets.GRL.Scripts.Managers
 
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    // 1. Parse the JSON response from your Flask API to get the new GUID
-                    // Adjust the ["race_id"] key if your Python API returns a different key name
+                    // Parse the JSON response from your Flask API to get the new GUID
                     var responseJson = Newtonsoft.Json.Linq.JObject.Parse(request.downloadHandler.text);
                     string generatedRaceId = responseJson["race_id"]?.ToString();
 
-                    // 2. Inject the UUID directly into the live Fusion Session Properties
+                    // Inject the UUID directly into the live Fusion Session Properties
                     if (!string.IsNullOrEmpty(generatedRaceId) && runner != null && runner.SessionInfo != null)
                     {
                         var updatedProps = new Dictionary<string, SessionProperty>
@@ -240,6 +277,7 @@ namespace Assets.GRL.Scripts.Managers
                 }
             }
         }
+
 
         public static SceneRef GetSceneRefFromPath(string scenePath)
         {
@@ -288,4 +326,5 @@ namespace Assets.GRL.Scripts.Managers
         }
         #endregion
     }
+
 }

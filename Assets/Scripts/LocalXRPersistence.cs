@@ -101,6 +101,11 @@ public class LocalXRPersistence : MonoBehaviour
         transform.position += positionOffset;
 
         Debug.Log($"[Inverse Snap] Aligned physical anchor '{selectedTrackAnchor.name}' to '{trackGameObjectName}'.");
+
+        GetComponent<TrackCameraFramer>().trackTarget = networkedTrack;
+        GetComponent<TrackCameraFramer>().FrameTrackView();
+
+
     }
 
     // Require the loaded scene as a parameter and search IT instead of gameObject.scene
