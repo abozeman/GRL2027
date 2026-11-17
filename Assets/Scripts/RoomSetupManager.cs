@@ -209,7 +209,6 @@ public class RoomSetupManager : MonoBehaviour
                 // Instantiate the race button prefab
                 GameObject raceButton = Instantiate(raceButtonPrefab, raceUIButtonContainer.transform);
                 raceButton.GetComponent<GRLRaceButtonClickHandller>()._raceInfo = race;
-                raceButton.AddComponent<ClientManager>(); // Add the ClientManager component to the button
 
                 // Highly recommended for UI elements to prevent weird stretching
                 raceButton.transform.localScale = Vector3.one;

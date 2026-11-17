@@ -202,7 +202,7 @@ public class LobbyTrackPlacementManager : MonoBehaviour
         }
 
         OnPlacementSpotSelected?.Invoke();
-        HidePreviewsForGameTransition();
+        //HidePreviewsForGameTransition();
     }
 
     public void HidePreviewsForGameTransition()

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6905258074554119224}
   - component: {fileID: 1983928304842994215}
   - component: {fileID: 6349680013547687655}
+  - component: {fileID: 5971429110926771567}
   m_Layer: 0
   m_Name: GRLButton
   m_TagString: QDSUIToggleButton
@@ -129,6 +130,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f6bd84d57e39b242ba812d3a2cf6dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+--- !u!114 &5971429110926771567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 688320000250573698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0adba22fa4045148843cd48f48c7a99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.Managers.ClientManager
+  _runnerClientPrefab: {fileID: 3456802343237632205, guid: 146b653c38070b946b38832f6c26cecf, type: 3}
 --- !u!1 &1878973788416681597
 GameObject:
   m_ObjectHideFlags: 0
