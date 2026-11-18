@@ -140,6 +140,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2868216338370173421, guid: 83ad694f134ab954580473212156b35a, type: 3}
     - target: {fileID: 2168714008141207826, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
+      propertyPath: IsTestMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2168714008141207826, guid: 3702471ba3292e447ac28ed732341de2, type: 3}
       propertyPath: RaceLights
       value: 
       objectReference: {fileID: 6274241172190992784, guid: 56892ada572c8c74ab35fb6ac62977fd, type: 3}

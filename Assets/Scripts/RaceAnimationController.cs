@@ -1,12 +1,12 @@
 using Fusion;
-using M2MqttUnity;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
+using System;
+using Newtonsoft.Json.Linq;
+using M2MqttUnity;
 
 public class RaceAnimationController : NetworkBehaviour
 {
-    // 1. The Authoritative Networked Struct
     [System.Serializable]
     public struct RaceStateBools : INetworkStruct
     {
@@ -18,203 +18,108 @@ public class RaceAnimationController : NetworkBehaviour
         public NetworkBool IsFinished;
     }
 
+    [Networked] public RaceStateBools AnimationStates { get; set; }
 
+    // The exact Fusion simulation time when the Python Race Manager changed the state
+    [Networked] public double StateStartTime { get; set; }
 
     private ChangeDetector _changes;
 
-    [Header("Animation & VFX References")]
-    //[SerializeField] private ParticleSystem _preRaceMaterializationVFX;
-    //[SerializeField] private ParticleSystem _acceptingContestantsMaterializationVFX;
-    private Animator _raceStartLightAnimator;
-    //[SerializeField] private Animator _spectatorUIGlitchAnimator;
-    //[SerializeField] private Camera _mainCamera; // For FOV zooms
+    [Header("Timeline Orchestrator")]
+    [SerializeField] private PlayableDirector _sequenceDirector;
 
-    //[Header("Audio Pipeline")]
-    //[SerializeField] private AudioSource _announcerAudioSource;
-    //[SerializeField] private AudioClip _countdownClip; // "Three, two, one..."
-    //[SerializeField] private AudioClip _greenFlagClip; // "...green flag!"
-    //[SerializeField] private AudioClip _checkeredFlagClip;
+    [Header("Cinematic Chunks (Playable Assets)")]
+    [SerializeField] private PlayableAsset _preRaceChunk;
+    [SerializeField] private PlayableAsset _acceptContestantsChunk;
+    [SerializeField] private PlayableAsset _countdownChunk;
+    [SerializeField] private PlayableAsset _finalCountdownChunk;
+    [SerializeField] private PlayableAsset _inProgressChunk;
 
-    [Header("AnimationStates ")]
-
-    [Networked]
-    public RaceStateBools AnimationStates { get; set; }
-
-    private struct QueuedMessage
-    {
-        public string Topic;
-        public string Payload;
-    }
-    private List<QueuedMessage> eventMessages = new List<QueuedMessage>();
-    String SessionName;
+    // Local caches for the dynamic durations
+    private int _preRaceSecs = 10;
+    private int _acceptContestantsSecs = 60;
+    private int _countdownSecs = 30;
 
     public override void Spawned()
     {
         _changes = GetChangeDetector(ChangeDetector.Source.SnapshotFrom);
 
-        SessionName = Runner.SessionInfo.Name.ToLower();
-        Debug.Log($"[RaceAnimationController] has Spawned in room: {SessionName}");
+        // 1. Retrieve the dynamic phase durations assigned by the Orchestrator
+        if (Runner.SessionInfo.Properties.TryGetValue("preRaceSecs", out var preRaceProp))
+            _preRaceSecs = preRaceProp;
 
-        // (Keep your existing Server MQTT subscription logic here)
-        if (M2MqttUnityClientNetwork.Instance != null && Runner.IsServer)
+        if (Runner.SessionInfo.Properties.TryGetValue("acceptContestantsSecs", out var acceptProp))
+            _acceptContestantsSecs = acceptProp;
+
+        if (Runner.SessionInfo.Properties.TryGetValue("countdownSecs", out var countdownProp))
+            _countdownSecs = countdownProp;
+
+        Debug.Log($"[RaceAnimationController] Loaded Dynamic Phase Durations -> PreRace: {_preRaceSecs}s | Accept: {_acceptContestantsSecs}s | Countdown: {_countdownSecs}s");
+
+        if (Runner.IsServer)
         {
-            // Subscribe to the global event
-            M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeMessage;
-
-            string raceStateTopic = $"race/{SessionName}/state";
-            M2MqttUnityClientNetwork.Instance.SubscribeToTopic(raceStateTopic);
-            Debug.Log($"[RaceAnimationController] Hooked into Singleton and subscribed to {raceStateTopic}");
-
+            if (M2MqttUnityClientNetwork.Instance != null)
+            {
+                M2MqttUnityClientNetwork.Instance.OnMessageReceived += DecodeStateMessage;
+                string topic = $"race/{Runner.SessionInfo.Name}/state";
+                M2MqttUnityClientNetwork.Instance.SubscribeToTopic(topic);
+            }
+        }
+        else
+        {
+            // LATE JOINER CATCH: Evaluate immediately upon entering the room
+            EvaluateAndPlayCurrentState();
         }
     }
 
-    public void AddRaceLightsAnimator(Animator _animator)
+    public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        _raceStartLightAnimator = _animator;
+        if (Runner.IsServer && M2MqttUnityClientNetwork.Instance != null)
+        {
+            M2MqttUnityClientNetwork.Instance.OnMessageReceived -= DecodeStateMessage;
+        }
     }
 
-    protected void DecodeMessage(string topic, byte[] message)
+    private void DecodeStateMessage(string topic, byte[] message)
     {
-        if (topic.Contains($"telemetry")) return;
-
-        Debug.Log($"[RaceAnimationController] Topic: {topic}");
-
+        if (!topic.EndsWith("/state")) return;
 
         try
         {
-            string msg = System.Text.Encoding.UTF8.GetString(message);
-            string myRoomName = Runner.SessionInfo.Name.ToLower();
+            string msgRaw = System.Text.Encoding.UTF8.GetString(message);
+            JObject json = JObject.Parse(msgRaw);
+            string newState = json["state"]?.ToString();
 
-            Debug.Log($"[RaceAnimationController] Topic | Message: {topic} | {msg}");
+            if (string.IsNullOrEmpty(newState)) return;
 
+            var states = AnimationStates;
+            states.IsPreRace = false;
+            states.IsAcceptingContestants = false;
+            states.IsCountdown = false;
+            states.IsFinalCountdown = false;
+            states.IsInProgress = false;
+            states.IsFinished = false;
 
-            if (topic.Contains($"race/{myRoomName}/state"))
+            switch (newState)
             {
-                eventMessages.Add(new QueuedMessage { Topic = topic, Payload = msg });
+                case "PRE_RACE": states.IsPreRace = true; break;
+                case "ACCEPT_CONTESTANTS": states.IsAcceptingContestants = true; break;
+                case "COUNTDOWN": states.IsCountdown = true; break;
+                case "FINAL_COUNTDOWN": states.IsFinalCountdown = true; break;
+                case "IN_PROGRESS": states.IsInProgress = true; break;
+                case "FINISHED": states.IsFinished = true; break;
             }
 
+            AnimationStates = states;
+
+            // Stamp the global Fusion time to sync all clients perfectly
+            StateStartTime = Runner.SimulationTime;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[RaceAnimationController] DecodeMessage EXCEPTION: {e.StackTrace}");
+            Debug.LogError($"[RaceAnimationController] MQTT Parse Exception: {e.Message}");
         }
     }
-
-    public override void FixedUpdateNetwork()
-    {
-        if (eventMessages.Count > 0)
-        {
-            foreach (var msg in eventMessages)
-            {
-                ProcessMessage(msg.Topic, msg.Payload);
-            }
-            eventMessages.Clear();
-        }
-    }
-
-    private void ProcessMessage(string topic, string msg)
-    {
-        try
-        {
-            string myRoomName = Runner.SessionInfo.Name.ToLower();
-
-            if (topic.Contains("state"))
-            {
-                // FIX 2: Safely parse the JSON using Newtonsoft (JObject) 
-                // to completely ignore case-sensitivity mismatches in the Python payloads
-                var jsonData = Newtonsoft.Json.Linq.JObject.Parse(msg);
-                string newState = (string)jsonData.GetValue("state", StringComparison.OrdinalIgnoreCase);
-                UpdateRaceState(newState);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[RaceAnimationController] ProcessMessage EXCEPTION: {e.Message}");
-            Debug.LogError($"[RaceAnimationController] ProcessMessage StackTrace: {e.StackTrace}");
-        }
-    }
-
-    private void UpdateRaceState(string newState)
-    {
-        if (string.IsNullOrEmpty(newState))
-        {
-            Debug.LogError("[RaceAnimationController] Received empty race state. Ignoring.");
-            return;
-        }
-
-        Debug.Log($"[RaceAnimationController] raceAnimationController == : {newState}");
-
-        switch (newState)
-        {
-            case "PRE_RACE":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = true,
-                    IsAcceptingContestants = false,
-                    IsCountdown = false,
-                    IsFinalCountdown = false,
-                    IsInProgress = false,
-                    IsFinished = false
-                };
-                break;
-            case "ACCEPT_CONTESTANTS":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = false,
-                    IsAcceptingContestants = true,
-                    IsCountdown = false,
-                    IsFinalCountdown = false,
-                    IsInProgress = false,
-                    IsFinished = false
-                };
-                break;
-            case "COUNTDOWN":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = false,
-                    IsAcceptingContestants = false,
-                    IsCountdown = true,
-                    IsFinalCountdown = false,
-                    IsInProgress = false,
-                    IsFinished = false
-                };
-                break;
-            case "FINAL_COUNTDOWN":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = false,
-                    IsAcceptingContestants = false,
-                    IsCountdown = false,
-                    IsFinalCountdown = true,
-                    IsInProgress = false,
-                    IsFinished = false
-                };
-                break;
-            case "IN_PROGRESS":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = false,
-                    IsAcceptingContestants = false,
-                    IsCountdown = false,
-                    IsFinalCountdown = false,
-                    IsInProgress = true,
-                    IsFinished = false
-                };
-                break;
-            case "FINISHED":
-                AnimationStates = new RaceStateBools
-                {
-                    IsPreRace = false,
-                    IsAcceptingContestants = false,
-                    IsCountdown = false,
-                    IsFinalCountdown = false,
-                    IsInProgress = false,
-                    IsFinished = true
-                };
-                break;
-        }
-    }
-
 
     public override void Render()
     {
@@ -224,70 +129,54 @@ public class RaceAnimationController : NetworkBehaviour
             {
                 if (propertyName == nameof(AnimationStates))
                 {
-                    CheckAndTriggerAnimations();
+                    // ACTIVE PLAYER CATCH: The server just flipped the state switch
+                    EvaluateAndPlayCurrentState();
                 }
             }
         }
     }
 
-    // 2. The Client-Side Animation Party
-    private void CheckAndTriggerAnimations()
+    private void EvaluateAndPlayCurrentState()
     {
-        // Because the server resets all bools to false before setting the active one to true,
-        // we can safely evaluate these without fear of overlap.
+        if (AnimationStates.IsPreRace) PlaySyncedTimelineChunk(_preRaceChunk);
+        else if (AnimationStates.IsAcceptingContestants) PlaySyncedTimelineChunk(_acceptContestantsChunk);
+        else if (AnimationStates.IsCountdown) PlaySyncedTimelineChunk(_countdownChunk);
+        else if (AnimationStates.IsFinalCountdown) PlaySyncedTimelineChunk(_finalCountdownChunk);
+        else if (AnimationStates.IsInProgress) PlaySyncedTimelineChunk(_inProgressChunk);
+    }
 
-        if (AnimationStates.IsPreRace)
-        {
-            Debug.Log("[Animation Party] State: PRE_RACE");
-            // Trigger the neon wireframe box to solid chassis digital materialization or dissolve shader.
-            //if (_preRaceMaterializationVFX != null) _preRaceMaterializationVFX.Play();
-            if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("PreRace");
-        }
-        else if (AnimationStates.IsAcceptingContestants)
-        {
-            Debug.Log("[Animation Party] State: ACCEPTING_CONTESTANTS");
-            // Trigger the neon wireframe box to solid chassis digital materialization or dissolve shader.
-            //if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("StartSequence");
-        }
-        else if (AnimationStates.IsCountdown)
-        {
-            Debug.Log("[Animation Party] State: COUNTDOWN");
-            // Spawn or animate the holographic start-light array over the track center.
-            if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("Countdown");
+    private void PlaySyncedTimelineChunk(PlayableAsset timelineChunk)
+    {
+        if (timelineChunk == null) return;
 
-            // Play the pre-cached announcer prompt pulled directly from cache memory to prevent latency.
-            //if (_announcerAudioSource != null && _countdownClip != null)
-            //    _announcerAudioSource.PlayOneShot(_countdownClip);
-        }
-        else if (AnimationStates.IsFinalCountdown)
+        if (_sequenceDirector.state == PlayState.Playing)
         {
-            Debug.Log("[Animation Party] State: FINAL_COUNTDOWN");
-            // E.g., The lights turn red, tense bass thud audio
-            if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("FinalCountdown");
+            _sequenceDirector.Stop();
         }
-        else if (AnimationStates.IsInProgress)
+
+        _sequenceDirector.playableAsset = timelineChunk;
+
+        // Calculate exact time elapsed since the server broadcast the state change
+        double elapsedTime = Runner.SimulationTime - StateStartTime;
+        if (elapsedTime < 0) elapsedTime = 0;
+
+        // 1. If the late-joiner missed the cinematic entirely, snap to the final visual state
+        if (elapsedTime >= timelineChunk.duration)
         {
-            Debug.Log("[Animation Party] State: IN_PROGRESS");
-            // Trigger a momentary CRT screen-tear glitch on the spectator UI[cite: 1].
-            if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("InProgress");
+            Debug.Log($"[Playables] Chunk {timelineChunk.name} already finished. Snapping to final holding frame.");
 
-            //if (_spectatorUIGlitchAnimator != null) _spectatorUIGlitchAnimator.SetTrigger("ScreenTear");
+            // Fast-forward to the very end of the clip
+            _sequenceDirector.time = timelineChunk.duration;
 
-            // Execute a rapid camera zoom[cite: 1]. 
-            // (You can trigger a coroutine here to quickly lerp the _mainCamera.fieldOfView)
-
-            //if (_announcerAudioSource != null && _greenFlagClip != null)
-            //    _announcerAudioSource.PlayOneShot(_greenFlagClip);
+            // Evaluate() forces the timeline to instantly apply the visual changes (lights, shaders, transforms) 
+            // of the final frame without actually playing the animation block.
+            _sequenceDirector.Evaluate();
+            return;
         }
-        else if (AnimationStates.IsFinished)
-        {
-            Debug.Log("[Animation Party] State: FINISHED");
-            // Trigger a time-dilation effect (slow motion) and automatically transition the camera rig to the PODIUM coordinate station[cite: 1].
-            // Time.timeScale = 0.5f; // (Careful with time scale in multiplayer, usually better to handle via camera/UI pacing)
-            if (_raceStartLightAnimator != null) _raceStartLightAnimator.SetTrigger("Finished");
 
-            //if (_announcerAudioSource != null && _checkeredFlagClip != null)
-            //    _announcerAudioSource.PlayOneShot(_checkeredFlagClip);
-        }
+        // 2. Play the cinematic from the perfectly synchronized timestamp
+        _sequenceDirector.time = elapsedTime;
+        _sequenceDirector.Play();
+        Debug.Log($"[Playables] Executing {timelineChunk.name} chunk dynamically at {elapsedTime:F2}s");
     }
 }

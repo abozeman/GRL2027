@@ -33,10 +33,6 @@ public class SimulatedCarSpawnManager : NetworkBehaviour
             _colorId = Object.GetComponent<CarDataNetwork>().ColorId;
             _vid = Object.GetComponent<CarDataNetwork>().Vid;
 
-            //Find the Track in this Session and attach the car to it
-            //string track = $"RaceTrackShell1";
-            //_trackPlatform = FindInRunnerScene(track);
-            //transform.SetParent(_trackPlatform.transform);
             transform.localScale = new Vector3(0.06f, 0.06f, 0.06f);
 
             //find the MasterTelemetry Subscriber and register the car with it
@@ -47,7 +43,6 @@ public class SimulatedCarSpawnManager : NetworkBehaviour
         else
         {
             GetComponent<CarInputManagerLive>().enabled = false;
-            //GetComponent<CarControlDataLivePublisher>().enabled = true;
             GetComponent<PlayerInputProvider>().enabled = true;
 
 

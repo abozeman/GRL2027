@@ -624,6 +624,7 @@ GameObject:
   - component: {fileID: 6857537048276100602}
   - component: {fileID: 2085841105405445891}
   - component: {fileID: 1631116780215298437}
+  - component: {fileID: 5822957035839557485}
   m_Layer: 0
   m_Name: SimCar
   m_TagString: Untagged
@@ -713,6 +714,7 @@ MonoBehaviour:
   - {fileID: 6857537048276100602}
   - {fileID: 2085841105405445891}
   - {fileID: 1631116780215298437}
+  - {fileID: 5822957035839557485}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &4180487851149503529
 MonoBehaviour:
@@ -762,9 +764,9 @@ MonoBehaviour:
   _ColorId: 2
   _Vid: grlsimracer1
   _DriverName:
-    _length: 4
+    _length: 9
     _data:
-      Data: 540000006f0000006e0000007900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+      Data: 53000000690000006d0000002000000052000000610000006300000065000000720000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!114 &2085841105405445891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,3 +797,23 @@ MonoBehaviour:
   RaceId: default_race
   Vid: grlsimracer1
   PublishRate: 0.033
+--- !u!114 &5822957035839557485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525085160519899942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8c6d00b56bbede488849ebfc23951b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.GRL.Scripts.SimulatedCarLocalizer
+  _inputManager: {fileID: 4180487851149503529}
+  RaceId: default_race
+  Vid: grlsimracer1
+  CarWidth: 0.2
+  CarLength: 0.36
+  OuterBoundary: []
+  InnerBoundary: []
+  StartLine: []

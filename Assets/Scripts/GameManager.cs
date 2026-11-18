@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;            // Added for payload encoding
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking; // Added for REST API
 using uPLibrary.Networking.M2Mqtt.Messages;
@@ -75,7 +76,7 @@ namespace cryptokartz.Scripts.GameControllers
                     string commandTopic = $"game/manager/{SessionName}/#";
                     M2MqttUnityClientNetwork.Instance.SubscribeToTopic(commandTopic);
                     Debug.Log($"[GameManager] Hooked into Singleton and subscribed to {commandTopic}");
-                   
+
                 }
 
             }
@@ -144,7 +145,7 @@ namespace cryptokartz.Scripts.GameControllers
             {
                 string myRoomName = Runner.SessionInfo.Name.ToLower();
 
-                if (topic.Contains("livecar") || topic.Contains("ghostcar"))
+                if (topic.Contains("livecar") || topic.Contains("ghostcar") || topic.Contains("simcar"))
                 {
                     // FIX 2: Safely parse the JSON using Newtonsoft (JObject) 
                     // to completely ignore case-sensitivity mismatches in the Python payloads
@@ -164,6 +165,10 @@ namespace cryptokartz.Scripts.GameControllers
                     else if (topic.Contains("ghostcar"))
                     {
                         NetworkObject car = grlGhostCarSpawn(_ghostCarPrefab);
+                    }
+                    else if (topic.Contains("simcar"))
+                    {
+                        NetworkObject car = grlSimulatedCarSpawn(_simCarPrefab, PlayerRef.None);
                     }
                 }
             }
@@ -332,14 +337,50 @@ namespace cryptokartz.Scripts.GameControllers
 
         private void InitializeSimulatedCarBeforeSpawn(NetworkRunner runner, NetworkObject obj)
         {
-            // Inherit the track level and color logic you already wrote
             InitializeCarBeforeSpawn(runner, obj);
 
-            // Flag the car to intercept MQTT and use local Unity physics
             var inputManager = obj.GetComponent<CarInputManagerLive>();
-            if (inputManager != null)
+            if (inputManager != null) inputManager.IsSimulated = true;
+
+            var localizer = obj.GetComponent<SimulatedCarLocalizer>();
+            if (localizer != null)
             {
-                inputManager.IsSimulated = true;
+                var trackDefManager = runner.GetComponent<TrackDefinitionManager>();
+
+                // --- THE FIX: Convert NetworkArrays to standard Vector2[] ---
+
+                // 1. Copy Exterior Boundaries
+                if (!trackDefManager.ExteriorCoordinates.IsUnityNull() && trackDefManager.ExteriorCoordinates.Length > 0)
+                {
+                    Vector2[] extArray = new Vector2[trackDefManager.ExteriorCoordinates.Length];
+                    for (int i = 0; i < trackDefManager.ExteriorCoordinates.Length; i++)
+                    {
+                        extArray[i] = trackDefManager.ExteriorCoordinates[i];
+                    }
+                    localizer.OuterBoundary = extArray;
+                }
+
+                // 2. Copy Interior Boundaries
+                if (!trackDefManager.InteriorCoordinates.IsUnityNull() && trackDefManager.InteriorCoordinates.Length > 0)
+                {
+                    Vector2[] intArray = new Vector2[trackDefManager.InteriorCoordinates.Length];
+                    for (int i = 0; i < trackDefManager.InteriorCoordinates.Length; i++)
+                    {
+                        intArray[i] = trackDefManager.InteriorCoordinates[i];
+                    }
+                    localizer.InnerBoundary = intArray;
+                }
+
+                // 3. Copy Start Line
+                if (!trackDefManager.StartlineCoordinates.IsUnityNull() && trackDefManager.StartlineCoordinates.Length > 0)
+                {
+                    Vector2[] startArray = new Vector2[trackDefManager.StartlineCoordinates.Length];
+                    for (int i = 0; i < trackDefManager.StartlineCoordinates.Length; i++)
+                    {
+                        startArray[i] = trackDefManager.StartlineCoordinates[i];
+                    }
+                    localizer.StartLine = startArray;
+                }
             }
         }
 
@@ -354,9 +395,6 @@ namespace cryptokartz.Scripts.GameControllers
                 default: return new Vector3(0, 1.07f, 0);
             }
         }
-
-        
-
 
         #endregion
 

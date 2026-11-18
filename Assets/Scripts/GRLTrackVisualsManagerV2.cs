@@ -48,7 +48,7 @@ namespace Assets.CryptoKartz.Scripts
                 m_RaceLights.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
 
                 m_raceAnimationController = GameObject.Find("RaceAnimationController");
-                m_raceAnimationController.GetComponent<RaceAnimationController>().AddRaceLightsAnimator(m_RaceLights.GetComponent<Animator>());
+               // m_raceAnimationController.GetComponent<RaceAnimationController>().AddRaceLightsAnimator(m_RaceLights.GetComponent<Animator>());
 
                 // LATE-JOINER CATCH: Use our new highly reliable NetworkBool!
                 if (_trackDefinitionManager.IsTrackLoaded)
