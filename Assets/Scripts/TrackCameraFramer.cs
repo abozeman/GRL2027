@@ -39,17 +39,25 @@ public class TrackCameraFramer : MonoBehaviour
         }
         else
         {
-            // WEBXR / SPECTATOR CLIENT: The camera is decoupled from physical hardware tracking[cite: 6].
-            // We can directly manipulate its position and rotation to create a tactical view.
+            // WEBXR / SPECTATOR CLIENT: The camera is decoupled from physical hardware tracking.
+            // Apply the specific CenterEyeAnchor transform JSON values directly
 
-            // Position the camera slightly elevated and pulled back from the track center
-            Vector3 tacticalOffset = new Vector3(0f, 4.0f, -6.0f);
-            activeCam.transform.position = trackTarget.position + tacticalOffset;
+            activeCam.transform.position = new Vector3(
+                -0.5f,
+                0.31999945640563967f,
+                0.005000114440917969f
+            );
 
-            // Aim the camera directly at the track (or start lights by adding a Vector3 offset)
-            activeCam.transform.LookAt(trackTarget.position + (Vector3.up * 0.5f));
+            activeCam.transform.rotation = new Quaternion(
+                0.23928776383399964f,
+                0.6618271470069885f,
+                -0.23638209700584413f,
+                0.6699625253677368f
+            );
 
-            Debug.Log("[Camera Framer] WebXR camera snapped to tactical track view.");
+            activeCam.transform.localScale = Vector3.one;
+
+            Debug.Log("[Camera Framer] Camera snapped to exact CenterEyeAnchor JSON transform.");
         }
     }
 }
